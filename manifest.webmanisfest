@@ -5,5 +5,13 @@
   "display": "standalone",
   "background_color": "#f5f7f6",
   "theme_color": "#062f2b",
-  "description": "Live dispatch for SwiftShop runners"
+  "description": "Live dispatch for SwiftShop runners",
+  "icons": [
+    {
+      "src": "logo.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
 }
