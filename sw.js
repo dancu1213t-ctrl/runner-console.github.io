@@ -1,4 +1,4 @@
-const CACHE = 'swiftshop-runner-v2';
+const CACHE = 'swiftshop-runner-v3';
 const APP = ['./', './index.html', './manifest.webmanifest'];
 self.addEventListener('install', event => event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(APP))));
 self.addEventListener('activate', event => event.waitUntil(self.clients.claim()));
