@@ -6,6 +6,8 @@
   <meta name="theme-color" content="#062f2b" />
   <meta name="description" content="SwiftShop live runner dispatch" />
   <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" type="image/png" href="logo.png" />
+  <link rel="apple-touch-icon" href="logo.png" />
   <title>SwiftShop — Runner Dispatch</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -20,6 +22,17 @@
     .custom-scrollbar::-webkit-scrollbar {width:5px}.custom-scrollbar::-webkit-scrollbar-thumb{background:#cbd5d3;border-radius:99px}
     @keyframes slide { from { transform:translateY(18px); opacity:0 } to { transform:translateY(0); opacity:1 } }
     .arrival { animation:slide .35s ease-out both; }
+    .brand-logo { width:100%; height:100%; object-fit:contain; display:block; }
+    .brand-mark { overflow:hidden; background:#fff; padding:5px; }
+    .brand-mark--dark { background:#062f2b; border:1px solid rgba(16,185,129,.28); }
+    .earnings-strip { display:grid; grid-template-columns:minmax(0,1.45fr) minmax(11rem,.7fr) minmax(11rem,.7fr); gap:1px; overflow:hidden; background:#e5ebe8; border:1px solid #dfe7e3; border-radius:1.35rem; box-shadow:0 8px 30px rgba(11,55,48,.045); }
+    .earnings-cell { background:rgba(255,255,255,.92); padding:1.1rem 1.35rem; min-width:0; }
+    .earnings-label { color:#6b7c76; font-size:.62rem; font-weight:800; letter-spacing:.12em; text-transform:uppercase; }
+    .earnings-value { margin-top:.3rem; color:#092f2a; font-size:1.25rem; font-weight:800; letter-spacing:-.04em; }
+    .earnings-note { margin-top:.2rem; color:#85938e; font-size:.68rem; font-weight:600; line-height:1.35; }
+    @media (min-width: 1536px) { #dashboardScreen { max-width:92rem; } #ordersContainer { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); align-items:start; } #ordersContainer > .rounded-2xl { grid-column:1 / -1; } }
+    @media (max-width: 639px) {
+      body { overflow-x:hidden; } #dashboardScreen { padding:1rem 1rem 5.5rem; } #dashboardScreen header { align-items:flex-start; } #dashboardScreen header > div:first-child { min-width:0; } #dashboardScreen header h1 { font-size:.9rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:10.5rem; } #dashboardScreen header > div:last-child { flex-shrink:0; } #notifyButton { font-size:0; width:2.5rem; padding:.66rem 0; } #notifyButton::first-letter { font-size:.82rem; } .earnings-strip { grid-template-columns:1fr 1fr; border-radius:1.15rem; } .earnings-cell:first-child { grid-column:1 / -1; } .earnings-cell { padding:1rem; } .earnings-value { font-size:1.05rem; } #ordersContainer { padding:1rem; } #ordersContainer article > div:first-child { padding:1rem; } .tab { padding:.6rem .7rem; } }
   </style>
 </head>
 <body class="text-slate-800 min-h-screen selection:bg-emerald-600 selection:text-white">
@@ -33,7 +46,7 @@
   <section id="loginScreen" class="min-h-screen grid place-items-center p-5 noise">
     <div class="w-full max-w-5xl grid md:grid-cols-[1.1fr_.9fr] rounded-[2rem] overflow-hidden bg-white card border border-white">
       <div class="bg-[#062f2b] p-8 sm:p-12 text-white relative overflow-hidden"><div class="absolute inset-0 opacity-20 noise"></div><div class="relative">
-        <div class="flex items-center gap-3"><div class="w-11 h-11 bg-emerald-400 text-[#062f2b] rounded-2xl grid place-items-center font-black text-xl">S</div><span class="font-extrabold tracking-tight text-lg">SwiftShop</span></div>
+        <div class="flex items-center gap-3"><div class="brand-mark w-11 h-11 rounded-2xl"><img src="logo.png" alt="SwiftShop" class="brand-logo" /></div><span class="font-extrabold tracking-tight text-lg">SwiftShop</span></div>
         <div class="mt-16"><p class="text-emerald-300 text-xs font-extrabold uppercase tracking-[.18em]">Operations, in motion</p><h1 class="text-4xl sm:text-5xl leading-[1.05] tracking-tight font-extrabold mt-3">The fastest way to dispatch a run.</h1><p class="mt-5 text-emerald-50/70 max-w-sm text-sm leading-6">A live workspace for dispatchers and local runners. Every offer, response, payout and delivery stays visible.</p></div>
         <div class="mt-12 flex gap-6 text-xs"><span><b class="text-emerald-300">Live</b><br>Dispatch queue</span><span><b class="text-emerald-300">Instant</b><br>Runner responses</span><span><b class="text-emerald-300">PWA</b><br>Install-ready</span></div>
       </div></div>
@@ -47,7 +60,13 @@
   </section>
 
   <main id="dashboardScreen" class="hide max-w-6xl mx-auto px-4 py-5 sm:py-8 pb-28">
-    <header class="flex items-center justify-between gap-4 mb-7"><div class="flex items-center gap-3"><div class="w-11 h-11 rounded-2xl bg-[#062f2b] text-emerald-300 grid place-items-center font-black text-xl">S</div><div><h1 class="font-extrabold tracking-tight leading-tight">SwiftShop <span class="text-slate-400 font-semibold">/</span> <span id="runnerTitle">Runner</span></h1><p class="text-[10px] text-emerald-700 font-extrabold tracking-[.13em] uppercase"><span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1 animate-pulse"></span>Live dispatch connected</p></div></div><div class="flex items-center gap-2"><button id="notifyButton" onclick="enableNotifications()" class="px-3 py-2.5 rounded-xl bg-white border border-slate-200 text-xs font-extrabold hover:border-emerald-300">🔔 Alerts</button><button onclick="handleRunnerLogout()" class="px-3 py-2.5 rounded-xl bg-slate-900 text-white text-xs font-extrabold">Exit</button></div></header>
+    <header class="flex items-center justify-between gap-4 mb-5"><div class="flex items-center gap-3"><div class="brand-mark brand-mark--dark w-11 h-11 rounded-2xl"><img src="logo.png" alt="SwiftShop" class="brand-logo" /></div><div><h1 class="font-extrabold tracking-tight leading-tight">SwiftShop <span class="text-slate-400 font-semibold">/</span> <span id="runnerTitle">Runner</span></h1><p class="text-[10px] text-emerald-700 font-extrabold tracking-[.13em] uppercase"><span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1 animate-pulse"></span>Live dispatch connected</p></div></div><div class="flex items-center gap-2"><button id="notifyButton" onclick="enableNotifications()" class="px-3 py-2.5 rounded-xl bg-white border border-slate-200 text-xs font-extrabold hover:border-emerald-300">🔔 Alerts</button><button onclick="handleRunnerLogout()" class="px-3 py-2.5 rounded-xl bg-slate-900 text-white text-xs font-extrabold">Exit</button></div></header>
+
+    <section class="earnings-strip mb-5" aria-label="Runner earnings summary">
+      <div class="earnings-cell"><p class="earnings-label">Cumulative runner pay</p><p class="earnings-value">Completed delivery earnings</p><p class="earnings-note">Each completed run is retained in History with its recorded runner pay.</p></div>
+      <div class="earnings-cell"><p class="earnings-label">Per completed run</p><p class="earnings-value">Recorded</p><p class="earnings-note">Pay is locked to the delivery record.</p></div>
+      <div class="earnings-cell"><p class="earnings-label">Delivery ledger</p><p class="earnings-value">History</p><p class="earnings-note">Review completed work at any time.</p></div>
+    </section>
 
     <section id="adminPanel" class="hide mb-7 grid lg:grid-cols-[1.15fr_.85fr] gap-5"><div class="rounded-[1.6rem] p-6 sm:p-7 bg-[#062f2b] text-white card"><div class="flex justify-between gap-3"><div><p class="text-[10px] uppercase tracking-[.18em] font-extrabold text-emerald-300">Dispatch desk</p><h2 class="text-2xl font-extrabold mt-1">Send a runner offer</h2><p class="text-sm text-emerald-50/65 mt-1">This mirrors the WhatsApp brief in the live runner queue.</p></div><span class="w-10 h-10 grid place-items-center rounded-xl bg-white/10">✦</span></div>
         <div class="grid sm:grid-cols-2 gap-3 mt-6"><input id="customerName" placeholder="Customer name" class="dispatch-input" /><input id="customerPhone" placeholder="Phone number" class="dispatch-input" /><input id="runItems" placeholder="Pickup / items (use | to separate)" class="dispatch-input sm:col-span-2" /><input id="runLocation" placeholder="Google Maps link or delivery address" class="dispatch-input sm:col-span-2" /><div class="relative"><span class="absolute left-4 top-3.5 text-emerald-900 text-sm font-black">$</span><input id="runPay" inputmode="decimal" value="5.00" placeholder="Runner pay" class="dispatch-input !pl-8" /></div><select id="runPriority" class="dispatch-input"><option>Standard</option><option>Priority</option><option>Urgent</option></select></div>
