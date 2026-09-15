@@ -16,24 +16,24 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
     * { font-family: Manrope, sans-serif; } .mono { font-family: 'DM Mono', monospace; }
-    body { background:#f3f7f8; } .orb { position:fixed; border-radius:999px; filter:blur(80px); opacity:.2; pointer-events:none; }
-    .noise { background-image: radial-gradient(rgba(6,47,43,.08) .6px, transparent .6px); background-size: 9px 9px; }
+    body { background:#fff5ec; } .orb { position:fixed; border-radius:999px; filter:blur(80px); opacity:.22; pointer-events:none; }
+    .noise { background-image: radial-gradient(rgba(154,64,17,.09) .6px, transparent .6px); background-size: 9px 9px; }
     .card { box-shadow:0 8px 30px rgba(11,55,48,.06); } .hide { display:none!important; }
     .custom-scrollbar::-webkit-scrollbar {width:5px}.custom-scrollbar::-webkit-scrollbar-thumb{background:#cbd5d3;border-radius:99px}
     @keyframes slide { from { transform:translateY(18px); opacity:0 } to { transform:translateY(0); opacity:1 } }
     .arrival { animation:slide .35s ease-out both; }
     .brand-logo { width:100%; height:100%; object-fit:contain; display:block; }
     .brand-mark { overflow:hidden; background:#fff; padding:5px; }
-    .brand-mark--dark { background:#062f2b; border:1px solid rgba(16,185,129,.28); }
-    .signin-shell { background:rgba(255,255,255,.9); border:1px solid rgba(255,255,255,.9); box-shadow:0 24px 70px rgba(20,58,66,.14); }
-    .signin-input { width:100%; margin-top:.45rem; padding:.9rem 1rem; background:#f5f8f8; border:1px solid #dce7e6; border-radius:1rem; color:#173a39; font-size:.86rem; font-weight:700; outline:none; transition:.18s ease; }
-    .signin-input:focus { background:#fff; border-color:#4eb9a6; box-shadow:0 0 0 4px rgba(78,185,166,.14); }
-    .signin-button { background:linear-gradient(135deg,#0b7466,#126b83); box-shadow:0 13px 25px rgba(14,104,112,.22); }
-    .signin-button:hover { background:linear-gradient(135deg,#095f55,#105a70); }
-    .earnings-strip { display:grid; grid-template-columns:minmax(0,1.45fr) minmax(11rem,.7fr) minmax(11rem,.7fr); gap:1px; overflow:hidden; background:#e5ebe8; border:1px solid #dfe7e3; border-radius:1.35rem; box-shadow:0 8px 30px rgba(11,55,48,.045); }
+    .brand-mark--dark { background:#652d1b; border:1px solid rgba(255,190,100,.42); }
+    .signin-shell { background:rgba(255,255,255,.94); border:1px solid rgba(255,255,255,.96); box-shadow:0 24px 70px rgba(142,65,23,.16); }
+    .signin-input { width:100%; margin-top:.45rem; padding:.9rem 1rem; background:#fff9f5; border:1px solid #f0d8c8; border-radius:1rem; color:#5d2a1a; font-size:.86rem; font-weight:700; outline:none; transition:.18s ease; }
+    .signin-input:focus { background:#fff; border-color:#e67831; box-shadow:0 0 0 4px rgba(230,120,49,.14); }
+    .signin-button { background:linear-gradient(135deg,#e96e26,#c94e18); box-shadow:0 13px 25px rgba(197,70,19,.24); }
+    .signin-button:hover { background:linear-gradient(135deg,#d65e1d,#ae3c14); }
+    .earnings-strip { display:grid; grid-template-columns:minmax(0,1.45fr) minmax(11rem,.7fr) minmax(11rem,.7fr); gap:1px; overflow:hidden; background:#f0c39e; border:1px solid #edc6a8; border-radius:1.35rem; box-shadow:0 8px 30px rgba(142,65,23,.08); }
     .earnings-cell { background:rgba(255,255,255,.92); padding:1.1rem 1.35rem; min-width:0; }
     .earnings-label { color:#6b7c76; font-size:.62rem; font-weight:800; letter-spacing:.12em; text-transform:uppercase; }
-    .earnings-value { margin-top:.3rem; color:#092f2a; font-size:1.25rem; font-weight:800; letter-spacing:-.04em; }
+    .earnings-value { margin-top:.3rem; color:#7a3019; font-size:1.25rem; font-weight:800; letter-spacing:-.04em; }
     .earnings-note { margin-top:.2rem; color:#85938e; font-size:.68rem; font-weight:600; line-height:1.35; }
     @media (min-width: 1536px) { #dashboardScreen { max-width:92rem; } #ordersContainer { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); align-items:start; } #ordersContainer > .rounded-2xl { grid-column:1 / -1; } }
     @media (max-width: 639px) {
@@ -41,7 +41,7 @@
   </style>
 </head>
 <body class="text-slate-800 min-h-screen selection:bg-emerald-600 selection:text-white">
-  <div class="orb w-80 h-80 bg-cyan-300 -top-24 -left-24"></div><div class="orb w-96 h-96 bg-emerald-200 -bottom-48 -right-20"></div>
+  <div class="orb w-80 h-80 bg-orange-300 -top-24 -left-24"></div><div class="orb w-96 h-96 bg-amber-200 -bottom-48 -right-20"></div>
 
   <div id="toast" class="hide fixed z-[80] top-5 left-1/2 -translate-x-1/2 max-w-[92vw] bg-slate-950 text-white px-4 py-3 rounded-2xl shadow-2xl text-sm font-bold"></div>
   <div id="alarmBanner" class="hide fixed inset-x-0 top-0 z-[70] bg-gradient-to-r from-rose-600 to-orange-500 text-white px-4 py-3 shadow-2xl">
@@ -50,7 +50,7 @@
 
   <section id="loginScreen" class="min-h-screen grid place-items-center p-5 noise">
     <div class="signin-shell w-full max-w-md rounded-[2rem] p-8 sm:p-10">
-      <div class="text-center"><div class="brand-mark w-16 h-16 rounded-[1.35rem] mx-auto"><img src="logo.png" alt="SwiftShop" class="brand-logo" /></div><h1 class="mt-4 text-2xl font-extrabold tracking-tight text-[#133d42]">SwiftShop</h1><p class="mt-1 text-xs font-bold text-slate-400">Made for SwiftShop Runners</p></div>
+      <div class="text-center"><div class="brand-mark w-16 h-16 rounded-[1.35rem] mx-auto"><img src="logo.png" alt="SwiftShop" class="brand-logo" /></div><h1 class="mt-4 text-2xl font-extrabold tracking-tight text-[#6b2b1a]">SwiftShop</h1><p class="mt-1 text-xs font-bold text-slate-400">Made for SwiftShop Runners</p></div>
       <div class="mt-9 space-y-5"><label class="block"><span class="text-[10px] font-extrabold uppercase tracking-[.13em] text-slate-500">Email</span><input id="loginEmail" type="email" autocomplete="email" placeholder="you@example.com" class="signin-input" /></label>
       <label class="block"><span class="text-[10px] font-extrabold uppercase tracking-[.13em] text-slate-500">Password</span><input id="loginPassword" type="password" autocomplete="current-password" placeholder="••••••" class="signin-input" /></label>
       <button onclick="handleRunnerLogin()" class="signin-button w-full py-3.5 active:scale-[.99] transition rounded-2xl text-white text-xs tracking-[.08em] uppercase font-extrabold">Sign in</button></div>
@@ -66,7 +66,7 @@
       <div class="earnings-cell"><p class="earnings-label">Average per run</p><p class="earnings-value" id="earningsAverage">$0.00</p><p class="earnings-note">Based on completed runner pay.</p></div>
     </section>
 
-    <section id="adminPanel" class="hide mb-7 grid lg:grid-cols-[1.15fr_.85fr] gap-5"><div class="rounded-[1.6rem] p-6 sm:p-7 bg-[#062f2b] text-white card"><div class="flex justify-between gap-3"><div><p class="text-[10px] uppercase tracking-[.18em] font-extrabold text-emerald-300">Dispatch desk</p><h2 class="text-2xl font-extrabold mt-1">Send a runner offer</h2><p class="text-sm text-emerald-50/65 mt-1">This mirrors the WhatsApp brief in the live runner queue.</p></div><span class="w-10 h-10 grid place-items-center rounded-xl bg-white/10">✦</span></div>
+    <section id="adminPanel" class="hide mb-7 grid lg:grid-cols-[1.15fr_.85fr] gap-5"><div class="rounded-[1.6rem] p-6 sm:p-7 bg-[#652d1b] text-white card"><div class="flex justify-between gap-3"><div><p class="text-[10px] uppercase tracking-[.18em] font-extrabold text-orange-200">Dispatch desk</p><h2 class="text-2xl font-extrabold mt-1">Send a runner offer</h2><p class="text-sm text-orange-50/75 mt-1">This mirrors the WhatsApp brief in the live runner queue.</p></div><span class="w-10 h-10 grid place-items-center rounded-xl bg-white/10">✦</span></div>
         <div class="grid sm:grid-cols-2 gap-3 mt-6"><input id="customerName" placeholder="Customer name" class="dispatch-input" /><input id="customerPhone" placeholder="Phone number" class="dispatch-input" /><input id="runItems" placeholder="Pickup / items (use | to separate)" class="dispatch-input sm:col-span-2" /><input id="runLocation" placeholder="Google Maps link or delivery address" class="dispatch-input sm:col-span-2" /><div class="relative"><span class="absolute left-4 top-3.5 text-emerald-900 text-sm font-black">$</span><input id="runPay" inputmode="decimal" value="5.00" placeholder="Runner pay" class="dispatch-input !pl-8" /></div><select id="runPriority" class="dispatch-input"><option>Standard</option><option>Priority</option><option>Urgent</option></select></div>
         <button onclick="dispatchRun()" class="mt-4 w-full rounded-2xl bg-emerald-400 hover:bg-emerald-300 text-[#062f2b] py-3.5 text-xs uppercase tracking-wider font-extrabold">Broadcast run to available runners →</button></div>
       <div class="bg-white rounded-[1.6rem] border border-slate-200 p-6 card"><p class="text-[10px] uppercase tracking-[.18em] font-extrabold text-slate-400">Today’s pulse</p><div class="grid grid-cols-2 gap-3 mt-5"><div class="rounded-2xl bg-emerald-50 p-4"><p class="text-2xl font-extrabold text-emerald-800" id="statOpen">0</p><p class="text-[10px] uppercase tracking-wider text-emerald-700 font-bold mt-1">Open offers</p></div><div class="rounded-2xl bg-slate-100 p-4"><p class="text-2xl font-extrabold" id="statClaimed">0</p><p class="text-[10px] uppercase tracking-wider text-slate-500 font-bold mt-1">In progress</p></div></div><div class="mt-5 rounded-2xl border border-dashed border-slate-200 p-4"><p class="text-xs font-extrabold">Price escalation rule</p><p class="text-xs text-slate-500 mt-1 leading-5">When a runner declines, the offer is released again with <b class="text-emerald-700">+$0.50</b> and every runner receives the refreshed offer.</p></div></div></section>
