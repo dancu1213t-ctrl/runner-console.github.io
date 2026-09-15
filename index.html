@@ -63,7 +63,7 @@
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNiamFkYnFsbWtrdGxqZnBxb3djIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY5MTc2NTIsImV4cCI6MjEwMjQ5MzY1Mn0.RCgn8yNmxkQWFPu6sJdyYD3_zJ7n2QmvPQjqZC70F8s';
   const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   // Add the VAPID public key in Step 2. The private key must never be placed here.
-  const VAPID_PUBLIC_KEY = '';
+  const VAPID_PUBLIC_KEY = 'BKTjfXsnMNAs70x7eD-NAHRDDfq4ldiKx4WdFm4Wp6Rb3r3vtYYxa2u1WKCbBJkKX2W7u2FuLGgJnUIff6aRN9Y';
   let activeRunner='', currentUser=null, currentProfile=null, currentTab='available', allOrders=[], knownReadyOrderIds=new Set(), audioContext, alarmInterval, toastTimer;
   const isOpen = o => ['Ready','Pending'].includes(o.status) && !o.assigned_runner_id && (!o.active_status || o.active_status === 'Unassigned');
   const esc = value => String(value || '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
