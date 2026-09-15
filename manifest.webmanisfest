@@ -1,0 +1,9 @@
+{
+  "name": "SwiftShop Runner Dispatch",
+  "short_name": "SwiftShop",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f5f7f6",
+  "theme_color": "#062f2b",
+  "description": "Live dispatch for SwiftShop runners"
+}
