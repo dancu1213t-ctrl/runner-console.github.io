@@ -2,7 +2,13 @@ const CACHE = 'swiftshop-runner-v4';
 const APP = ['./', './index.html', './manifest.webmanifest'];
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(APP)).then(() => self.skipWaiting()));
+  event.waitUntil((async () => {
+    const cache = await caches.open(CACHE);
+    // Offline caching is helpful, but one unavailable file must never stop
+    // the worker that receives background notifications from activating.
+    await Promise.all(APP.map((url) => cache.add(url).catch(() => undefined)));
+    await self.skipWaiting();
+  })());
 });
 
 self.addEventListener('activate', (event) => {
