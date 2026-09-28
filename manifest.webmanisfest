@@ -1,17 +1,21 @@
 {
-  "name": "SwiftShop Runner Dispatch",
+  "id": "/",
+  "name": "SwiftShop Runner",
   "short_name": "SwiftShop",
-  "start_url": "./index.html",
+  "description": "SwiftShop live runner dispatch",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#f5f7f6",
+  "background_color": "#f6f7f5",
   "theme_color": "#062f2b",
-  "description": "Live dispatch for SwiftShop runners",
+  "prefer_related_applications": false,
   "icons": [
     {
-      "src": "logo.png",
-      "sizes": "any",
+      "src": "/logo.png",
+      "sizes": "1254x1254",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     }
   ]
 }
+
