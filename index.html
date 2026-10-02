@@ -83,6 +83,12 @@ button:focus-visible,a:focus-visible{outline:3px solid #eab488;outline-offset:3p
 </style><style id="live-order-style">.tracking-admin{padding:20px;margin:0 0 26px;border:1px solid #dfe6dc;border-radius:14px;background:#f8faf5}.tracking-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}.tracking-heading h3{font-size:17px;font-weight:800}.tracking-heading p,.tracking-admin p{font-size:12px;line-height:1.6;margin-top:6px}.tracking-admin button,.tracking-link button,.tracking-contact button{padding:9px 12px;border:1px solid #d7e0d2;border-radius:8px;background:#fff;font-size:12px;font-weight:700}.tracking-admin button:disabled{opacity:.5}.tracking-request{padding:16px;background:#fff;border:1px solid #e1e6dd;border-radius:12px;margin-top:12px}.tracking-request-top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:13px}.tracking-request-top span{font-size:10px;background:#eaf0e4;padding:4px 7px;border-radius:8px;text-transform:uppercase}.tracking-request small{font-size:10px;color:#84917a}.tracking-buttons{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.tracking-buttons span{font-size:11px;color:#52704a}.tracking-link{padding:12px;background:#fff1e3;border:1px solid #edb986;border-radius:10px;display:flex;gap:12px;align-items:center;justify-content:space-between;font-size:12px}.tracking-contact{padding:16px;margin-bottom:18px;border:1px solid #dde5d8;border-radius:12px;background:#fff;font-size:12px}.tracking-contact p{margin:12px 0;color:#75826c}.tracking-contact input{padding:10px;margin:8px;border:1px solid #dce3d6;border-radius:8px;font-size:16px;max-width:100%}.tracking-contact summary{cursor:pointer;font-weight:750}.tracking-contact span{display:block;margin-top:10px}.tracking-admin[hidden],.tracking-contact[hidden],.tracking-link[hidden]{display:none!important}
 
 .runner-photo-settings{display:grid;grid-template-columns:80px minmax(0,1fr);gap:16px;border-top:1px solid #e1e6dc;padding-top:18px;margin-top:18px}.runner-photo-preview{height:80px;width:80px;border-radius:50%;overflow:hidden;background:#f2f4ee;display:grid;place-items:center;border:1px solid #dce3d6}.runner-photo-preview img{width:100%;height:100%;object-fit:cover}.runner-photo-settings input[type=file]{display:block;margin:10px 0;max-width:100%;font-size:12px}.runner-photo-actions{display:flex;gap:8px;flex-wrap:wrap}.runner-photo-settings [hidden]{display:none!important}
+</style><style>
+#swiftRidePanel{background:transparent} .ride-toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}.ride-toolbar>div{flex:1;min-width:180px}.ride-toolbar strong{font-size:20px}.ride-toolbar p,.ride-location-note{font-size:12px;color:#748071;margin-top:5px}
+#swiftRidePanel button,#swiftRidePanel a{font:600 12px Manrope,sans-serif;border:1px solid #e0e6dc;background:#fff;color:#344332;border-radius:9px;padding:10px 13px;text-decoration:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}#swiftRidePanel button:disabled{opacity:.55;cursor:wait}#rideOnline[aria-pressed=true]{background:#e8f5e7;color:#246d2d;border-color:#aed2a9}
+#rideNotice{font-size:12px;line-height:1.6;margin:12px 0;color:#716d60}.ride-filters{display:flex;align-items:center;justify-content:space-between;margin:20px 0;font-size:12px;color:#748071}.ride-filters select{padding:9px;border:1px solid #dfe6da;border-radius:9px;background:white;margin-left:8px;color:#344332}#rideRows{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.ride-card{background:white;border:1px solid #e1e6df;border-radius:15px;padding:20px}.ride-card-top{display:flex;justify-content:space-between;align-items:start;gap:12px}.ride-card h3{font-size:16px;font-weight:750}.ride-card-top span{font-size:10px;background:#fff1e4;padding:6px 9px;border-radius:20px;color:#9c541e}.ride-card small{font-size:10px;color:#879082}.ride-card dl{margin:18px 0;background:#f8faf6;padding:12px;border-radius:10px}.ride-card dt{font-size:10px;color:#899281;margin-top:8px}.ride-card dt:first-child{margin-top:0}.ride-card dd{font-size:13px;line-height:1.5;margin:3px 0 0}.ride-card>p{font-size:12px}.ride-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}.ride-actions button[data-action]{background:#f8e6d5!important;border-color:#efc4a0!important;color:#8b451c!important}.ride-empty{grid-column:1/-1;padding:45px 20px;text-align:center;border:1px solid #e1e6df;border-radius:15px;background:white;font-size:13px;color:#748071}
+#swiftRideMap{width:min(780px,94vw);border:1px solid #dfe6da;border-radius:18px;padding:18px;max-height:92dvh}#swiftRideMap::backdrop{background:#16271a66}#swiftRideMap header{display:flex;align-items:center;justify-content:space-between;margin-bottom:15px}#swiftRideMap h2{font-size:18px;font-weight:700}#swiftRideMap button{padding:9px 14px;border:1px solid #ddd;border-radius:9px;background:white;font-size:12px}#rideMapCanvas{height:min(55dvh,440px);min-height:240px;border-radius:12px}#rideMapNotice{font-size:12px;color:#748071;margin-top:12px}
+@media(max-width:700px){#rideRows{grid-template-columns:1fr}.ride-toolbar>div{flex-basis:100%}.dispatch-navigation button{font-size:9px;padding-left:2px;padding-right:2px}}
 </style></head>
 <body class="text-slate-800 min-h-screen selection:bg-emerald-600 selection:text-white">
   <div class="orb w-80 h-80 bg-orange-300 -top-24 -left-24"></div><div class="orb w-96 h-96 bg-amber-200 -bottom-48 -right-20"></div>
@@ -287,18 +293,19 @@ renderOrders=function(){originalRenderOrders();if(currentProfile?.role!=='admin'
  const nav=document.createElement('nav');nav.className='dispatch-navigation';nav.setAttribute('aria-label','Workspace');
  const top=document.createElement('div');top.className='workspace-heading';const title=document.createElement('h2'),subtitle=document.createElement('p');title.tabIndex=-1;top.append(title,subtitle);
  const body=document.createElement('div');body.className='workspace-content';
- dashboard.append(nav,body);body.append(top,earnings,admin,workboard);
+ const rides=document.createElement('section');rides.id='swiftRidePanel';rides.hidden=true;
+ dashboard.append(nav,body);body.append(top,earnings,admin,workboard,rides);
  const workHeading=workboard.firstElementChild;workHeading.classList.add('legacy-workboard-heading');
- const pages={available:['Available runs','New delivery offers, ready when you are.'],active:['Active runs','Everything youâ€™re currently delivering.'],history:['Delivery history','A record of your completed runs.'],earnings:['Your earnings','Review your balance and request a cashout.'],dispatch:['Dispatch a run','Create an offer and send it to available runners.'],team:['Runner team','Availability, completed work and amounts payable.']};
- const icons={available:'<rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/>',active:'<path d="M3 7h11v10H3zM14 10h4l3 4v3h-7"/><circle cx="7" cy="18" r="2"/><circle cx="18" cy="18" r="2"/>',history:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',earnings:'<rect x="3" y="5" width="18" height="15" rx="2"/><path d="M3 9h18M15 14h3"/>',dispatch:'<path d="M12 4v16M4 12h16"/>',team:'<circle cx="9" cy="8" r="3"/><path d="M3 21v-3a6 6 0 0 1 12 0v3M16 5a3 3 0 0 1 0 6M18 14a5 5 0 0 1 3 4v3"/>'};
+ const pages={rides:['Rides','Ride requests, driver availability and live progress.'],available:['Available runs','New delivery offers, ready when you are.'],active:['Active runs','Everything youâ€™re currently delivering.'],history:['Delivery history','A record of your completed runs.'],earnings:['Your earnings','Review your balance and request a cashout.'],dispatch:['Dispatch a run','Create an offer and send it to available runners.'],team:['Runner team','Availability, completed work and amounts payable.']};
+ const icons={rides:'<path d="M5 17h14l-1-7H6zM7 10l2-5h6l2 5"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/>',available:'<rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/>',active:'<path d="M3 7h11v10H3zM14 10h4l3 4v3h-7"/><circle cx="7" cy="18" r="2"/><circle cx="18" cy="18" r="2"/>',history:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',earnings:'<rect x="3" y="5" width="18" height="15" rx="2"/><path d="M3 9h18M15 14h3"/>',dispatch:'<path d="M12 4v16M4 12h16"/>',team:'<circle cx="9" cy="8" r="3"/><path d="M3 21v-3a6 6 0 0 1 12 0v3M16 5a3 3 0 0 1 0 6M18 14a5 5 0 0 1 3 4v3"/>'};
  let selected='',role='',moving=false;
  const oldTab=window.switchTab;
- function allowed(){return currentProfile?.role==='admin'?['dispatch','team','available']:['available','active','history','earnings'];}
- function renderNav(){nav.replaceChildren();for(const page of allowed()){const button=document.createElement('button');button.type='button';button.dataset.page=page;button.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+icons[page]+'</svg>';const label=document.createElement('span');label.textContent=page==='available'?'Available':page==='active'?'Active':page==='history'?'History':page==='earnings'?'Earnings':page==='dispatch'?'Dispatch':'Team';button.append(label);button.onclick=()=>navigate(page,true);nav.append(button);}}
+ function allowed(){return currentProfile?.role==='admin'?['dispatch','rides','team','available']:['available','active','rides','history','earnings'];}
+ function renderNav(){nav.replaceChildren();for(const page of allowed()){const button=document.createElement('button');button.type='button';button.dataset.page=page;button.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+icons[page]+'</svg>';const label=document.createElement('span');label.textContent=page==='rides'?'Rides':page==='available'?'Available':page==='active'?'Active':page==='history'?'History':page==='earnings'?'Earnings':page==='dispatch'?'Dispatch':'Team';button.append(label);button.onclick=()=>navigate(page,true);nav.append(button);}}
  function navigate(page,push=false){if(!currentProfile)return;if(!allowed().includes(page))page=allowed()[0];selected=page;
   nav.querySelectorAll('button').forEach(b=>{if(b.dataset.page===page)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
   title.textContent=pages[page][0];subtitle.textContent=pages[page][1];
-  earnings.hidden=page!=='earnings';workboard.hidden=!['available','active','history'].includes(page);
+  rides.hidden=page!=='rides';earnings.hidden=page!=='earnings';workboard.hidden=!['available','active','history'].includes(page);
   admin.hidden=!['dispatch','team'].includes(page);adminParts[0].hidden=adminParts[1].hidden=page!=='dispatch';adminParts[2].hidden=page!=='team';
   if(['available','active','history'].includes(page)){moving=true;try{oldTab(page);}finally{moving=false;}}
   if(page==='earnings')refreshCashoutSummary();if(page==='team')refreshAdminRunnerTracker();
@@ -350,5 +357,110 @@ renderOrders=function(){originalRenderOrders();if(currentProfile?.role!=='admin'
 
  async function syncRole(){const role=currentProfile?.role||'';section.hidden=role!=='admin';contact.hidden=role!=='runner';if(role!==lastRole){lastRole=role;if(role==='runner'){loadRunnerPhoto();const {data}=await supabaseClient.from('profiles').select('delivery_contact_phone').eq('id',currentUser.id).maybeSingle();field('runnerDeliveryPhone').value=data?.delivery_contact_phone||'';contact.open=!data?.delivery_contact_phone;}if(role==='admin')refresh();}}
  syncRole();setInterval(()=>{syncRole();if(!document.hidden)refresh();},10000);
+})();
+</script><script id="swiftride-controller">(() => {
+ 'use strict';
+ const root=document.getElementById('swiftRidePanel');
+ root.innerHTML='<div class="ride-toolbar"><div><strong>SwiftRide</strong><p>One ride at a time. Location is shared while you are online.</p></div><button type="button" id="rideOnline">Go online for rides</button><button type="button" id="rideRefresh">Refresh</button></div><p id="rideNotice" role="status" aria-live="polite">Loading rides…</p><div class="ride-filters"><label>Show <select id="rideFilter"><option value="open">Open rides</option><option value="mine">My current ride</option><option value="history">Recent history</option></select></label><span id="rideCount"></span></div><div id="rideRows"></div>';
+ const $=id=>document.getElementById(id),safe=esc;
+ let rows=[],watch=null,online=false,loading=false,sending=false,lastSent=0,position=null,identity=null,sequence=0;
+ let locationTimer=null,requestVersion=0;
+ const labels={requested:'Waiting for a driver',accepted:'Driver on the way',arrived:'Driver arrived',in_progress:'Ride in progress',completed:'Completed',cancelled:'Cancelled'};
+ function notice(text){$('rideNotice').textContent=text;}
+ function onlineUI(){ $('rideOnline').textContent=online?'● Online · Go offline':'Go online for rides';$('rideOnline').setAttribute('aria-pressed',String(online)); }
+ async function rpc(name,args){const {data,error}=await supabaseClient.rpc(name,args);if(error)throw error;return data;}
+ function stopLocal(){++sequence;if(watch!==null)navigator.geolocation.clearWatch(watch);watch=null;clearInterval(locationTimer);locationTimer=null;online=false;position=null;onlineUI();}
+ async function offline(){stopLocal();try{await rpc('swiftride_presence',{p_online:false});notice('Offline for rides. Location sharing stopped.');}catch(e){notice('Location sharing stopped on this device. Could not update the server; availability expires within 90 seconds.');}await refresh();}
+ async function publish(){
+  if(!online||!position||sending)return;
+  if(Date.now()-position.at>60000){notice('GPS signal is stale. Your location will stop appearing until it recovers.');return;}
+  const token=sequence;sending=true;
+  try{await rpc('swiftride_presence',{p_online:true,p_lat:position.lat,p_lng:position.lng,p_accuracy:position.accuracy});if(token===sequence){lastSent=Date.now();notice('Online · GPS updated '+new Date(lastSent).toLocaleTimeString()+'. Keep this page open while driving.');}}
+  catch(e){if(token===sequence)notice('GPS could not sync: '+e.message);}
+  finally{sending=false;if(token!==sequence&&!online&&currentProfile?.role==='runner')rpc('swiftride_presence',{p_online:false}).catch(()=>{});}
+ }
+ $('rideOnline').onclick=async()=>{
+  if(online)return offline();
+  if(currentProfile?.role!=='runner')return;
+  if(!navigator.geolocation||!window.isSecureContext){notice('GPS needs the published HTTPS website and location permission.');return;}
+  online=true;onlineUI();const token=++sequence;notice('Allow location access to go online…');
+  watch=navigator.geolocation.watchPosition(pos=>{
+   if(token!==sequence)return;
+   if(pos.coords.accuracy>200){notice('GPS is too imprecise. Move outdoors or enable precise location.');return;}
+   position={lat:pos.coords.latitude,lng:pos.coords.longitude,accuracy:pos.coords.accuracy,at:Date.now()};
+   if(Date.now()-lastSent>10000)publish().then(refresh);
+  },err=>{
+   if(token!==sequence)return;
+   if(err.code===1){offline().then(()=>notice('Location permission was denied. Enable it before going online.'));}
+   else notice('Waiting for GPS. Stale locations are hidden from customers.');
+  },{enableHighAccuracy:true,timeout:15000,maximumAge:5000});
+  locationTimer=setInterval(publish,15000);
+ };
+ function routeLink(r){return 'https://www.google.com/maps/dir/?api=1&origin='+encodeURIComponent(r.pickup_lat+','+r.pickup_lng)+'&destination='+encodeURIComponent(r.dropoff_lat+','+r.dropoff_lng)+'&travelmode=driving';}
+ function draw(){
+  const admin=currentProfile?.role==='admin',filter=$('rideFilter').value;
+  const list=rows.filter(r=>filter==='history'?['completed','cancelled'].includes(r.status):filter==='mine'?(!['requested','completed','cancelled'].includes(r.status)&&(admin||r.driver_id===currentUser?.id)):!['completed','cancelled'].includes(r.status));
+  $('rideCount').textContent=list.length+' ride'+(list.length===1?'':'s');
+  $('rideRows').innerHTML=list.map(r=>{
+   let actions='';const action=(value,label)=>'<button type="button" data-action="'+value+'" data-id="'+safe(r.id)+'">'+label+'</button>';
+   if(!admin&&r.status==='requested')actions=action('accept','Accept ride');
+   if(!admin&&r.driver_id===currentUser?.id){if(r.status==='accepted')actions=action('arrived','I have arrived');if(r.status==='arrived')actions=action('in_progress','Start ride');if(r.status==='in_progress')actions=action('completed','Complete ride');}
+   if(admin&&['requested','accepted','arrived'].includes(r.status))actions=action('cancel','Cancel ride');
+   const fresh=r.driver_online&&r.location_updated_at&&Date.now()-new Date(r.location_updated_at).getTime()<90000;
+   const phone=String(r.phone||'').replace(/[^\d+]/g,'');
+   return '<article class="ride-card"><div class="ride-card-top"><h3>'+safe(r.customer_name)+'</h3><span>'+safe(labels[r.status])+'</span></div><small>#'+safe(r.id.slice(0,8))+' · '+safe(new Date(r.created_at).toLocaleString())+'</small><dl><dt>Pickup</dt><dd>'+safe(r.pickup_label)+'</dd><dt>Destination</dt><dd>'+safe(r.dropoff_label)+'</dd></dl><p>'+safe(r.driver_name?'Driver: '+r.driver_name:'Available for drivers to accept')+'</p>'+(r.driver_id&&!['completed','cancelled'].includes(r.status)?'<p class="ride-location-note">'+(fresh?'GPS connected':'GPS unavailable or stale')+'</p>':'')+'<div class="ride-actions">'+(phone?'<a href="tel:'+safe(phone)+'">Call customer</a>':'')+'<a target="_blank" rel="noopener noreferrer" href="'+routeLink(r)+'">Directions</a><button type="button" data-map="'+safe(r.id)+'">View map</button>'+actions+'</div></article>';
+  }).join('')||'<div class="ride-empty">'+(!admin&&!online&&filter==='open'?'Go online to receive ride requests.':'No rides here yet.')+'</div>';
+ }
+ async function refresh(){
+  if(!currentUser||!['admin','runner'].includes(currentProfile?.role)||loading)return;
+  loading=true;const version=++requestVersion,user=currentUser.id;
+  try{const data=await rpc('swiftride_queue');if(version!==requestVersion||currentUser?.id!==user)return;rows=data||[];draw();if(!online)notice(currentProfile.role==='admin'?'Ride requests and driver progress update every 10 seconds.':'Go online when you are ready to take rides.');if(rideMapDialog.open)showMap(mapId,false);}
+  catch(e){notice(/swiftride|schema cache|does not exist/i.test(e.message)?'Rides setup is pending. Run SwiftRide-setup.sql in Supabase, then refresh.':'Could not load rides: '+e.message);}
+  finally{loading=false;}
+ }
+ $('rideRefresh').onclick=refresh;$('rideFilter').onchange=draw;
+ $('rideRows').onclick=async event=>{
+  const btn=event.target.closest('button');if(!btn)return;
+  if(btn.dataset.map){showMap(btn.dataset.map,true);return;}
+  if(!btn.dataset.action)return;
+  if(btn.dataset.action==='cancel'&&!confirm('Cancel this ride request?'))return;
+  btn.disabled=true;
+  try{await rpc('swiftride_action',{p_id:btn.dataset.id,p_action:btn.dataset.action});if(btn.dataset.action==='accept')$('rideFilter').value='mine';await refresh();}
+  catch(e){notice(e.message);}finally{btn.disabled=false;}
+ };
+ const rideMapDialog=document.createElement('dialog');rideMapDialog.id='swiftRideMap';
+ rideMapDialog.innerHTML='<header><h2>Ride map</h2><button type="button" id="rideMapClose">Close</button></header><div id="rideMapCanvas"></div><p id="rideMapNotice" role="status"></p>';
+ document.body.append(rideMapDialog);$('rideMapClose').onclick=()=>rideMapDialog.close();
+ let mapId=null,map=null,markers=[],mapVersion=0;
+ rideMapDialog.addEventListener('close',()=>{++mapVersion;});
+ async function showMap(id,open){
+  mapId=id;const r=rows.find(x=>x.id===id);if(!r)return;
+  if(open&&!rideMapDialog.open)rideMapDialog.showModal();if(!rideMapDialog.open)return;
+  const version=++mapVersion;
+  try{
+   await loadGoogleMaps();
+   const [{Map},{AdvancedMarkerElement,PinElement},{LatLngBounds}]=await Promise.all(['maps','marker','core'].map(x=>google.maps.importLibrary(x)));
+   if(version!==mapVersion||!rideMapDialog.open)return;
+   if(!map)map=new Map($('rideMapCanvas'),{center:{lat:r.pickup_lat,lng:r.pickup_lng},zoom:14,mapId:'DEMO_MAP_ID',streetViewControl:false,mapTypeControl:false});
+   markers.forEach(m=>m.map=null);markers=[];const bounds=new LatLngBounds();
+   function pin(lat,lng,label,color){const position={lat:Number(lat),lng:Number(lng)};const marker=new AdvancedMarkerElement({map,position,title:label});marker.append(new PinElement({glyphText:label,background:color,borderColor:color,glyphColor:'#fff'}));markers.push(marker);bounds.extend(position);}
+   pin(r.pickup_lat,r.pickup_lng,'A','#e9782b');pin(r.dropoff_lat,r.dropoff_lng,'B','#344b39');
+   const fresh=r.driver_online&&r.location_updated_at&&Date.now()-new Date(r.location_updated_at).getTime()<90000&&!['completed','cancelled'].includes(r.status);
+   if(fresh&&r.driver_lat!=null&&r.driver_lng!=null)pin(r.driver_lat,r.driver_lng,'D','#287aca');
+   if(open)map.fitBounds(bounds,55);
+   $('rideMapNotice').textContent='A: Pickup · B: Destination'+(fresh?' · D: Driver (last update '+new Date(r.location_updated_at).toLocaleTimeString()+')':' · Driver location is unavailable or stale.');
+  }catch(e){$('rideMapNotice').textContent='Could not load the map: '+e.message;}
+ }
+ async function sync(){
+  const id=currentUser?.id||null;
+  if(identity!==id){stopLocal();identity=id;rows=[];draw();await refresh();}
+  $('rideOnline').hidden=currentProfile?.role!=='runner';
+  if(!document.hidden&&currentUser)await refresh();
+ }
+ sync();setInterval(sync,10000);
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden){publish();refresh();}});
+ // GPS cannot be guaranteed in a backgrounded mobile browser; the server expires old positions.
+ window.addEventListener('pagehide',()=>{stopLocal();if(currentProfile?.role==='runner')rpc('swiftride_presence',{p_online:false}).catch(()=>{});});
+ const logout=window.handleRunnerLogout;window.handleRunnerLogout=async function(){if(currentProfile?.role==='runner')await offline();return logout.apply(this,arguments);};
 })();
 </script></body></html>
