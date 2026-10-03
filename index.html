@@ -368,30 +368,44 @@ renderOrders=function(){originalRenderOrders();if(currentProfile?.role!=='admin'
 (() => {
  'use strict';
  const root=document.getElementById('swiftRidePanel');
- root.innerHTML='<div class="driver-welcome"><img id="driverOwnPhoto" alt="Your profile photo" hidden><span>YOUR DRIVER WORKSPACE</span><h2>Ready for your next ride?</h2><p>You go online automatically when you sign in. Allow GPS to receive rides.</p></div><div class="ride-toolbar"><div><strong>SwiftRide</strong><p>One ride at a time. Location is shared while you are online.</p></div><button type="button" id="rideOnline">Go online for rides</button><button type="button" id="rideRefresh">Refresh</button></div><div class="driver-overview" id="driverOverview"><div><small>LOCATION</small><strong id="driverGPSState">Offline</strong><span id="driverPrecision">Go online to share GPS</span><button type="button" id="driverRetryGPS">Refresh GPS</button></div><div><small>REQUESTS</small><strong id="driverOpenCount">0</strong><span>Waiting for a driver</span></div><div><small>YOUR RIDE</small><strong id="driverActiveCount">0</strong><span>One ride at a time</span></div><div><small>YOUR VEHICLE</small><strong id="driverVehicle">Add vehicle details</strong><button type="button" id="driverEditProfile">Edit profile &amp; photo</button></div></div><p id="rideCommissionToday" role="status"></p><p id="rideNotice" role="status" aria-live="polite">Loading rides…</p><div class="ride-filters"><label>Show <select id="rideFilter"><option value="open">Open rides</option><option value="mine">My current ride</option><option value="history">Recent history</option></select></label><span id="rideCount"></span></div><div id="rideRows"></div>';
+ root.innerHTML='<div class="driver-welcome"><img id="driverOwnPhoto" alt="Your profile photo" hidden><span>YOUR DRIVER WORKSPACE</span><h2>Ready for your next ride?</h2><p>Ride alerts stay on until you turn them off. Allow GPS so passengers can find you nearby.</p></div><div class="ride-toolbar"><div><strong>SwiftRide</strong><p>One ride at a time. Location is shared while you are online.</p></div><button type="button" id="rideOnline">Go online for rides</button><button type="button" id="rideRefresh">Refresh</button></div><div class="driver-overview" id="driverOverview"><div><small>LOCATION</small><strong id="driverGPSState">Offline</strong><span id="driverPrecision">Go online to share GPS</span><button type="button" id="driverRetryGPS">Refresh GPS</button></div><div><small>REQUESTS</small><strong id="driverOpenCount">0</strong><span>Waiting for a driver</span></div><div><small>YOUR RIDE</small><strong id="driverActiveCount">0</strong><span>One ride at a time</span></div><div><small>YOUR VEHICLE</small><strong id="driverVehicle">Add vehicle details</strong><button type="button" id="driverEditProfile">Edit profile &amp; photo</button></div></div><p id="rideCommissionToday" role="status"></p><p id="rideNotice" role="status" aria-live="polite">Loading rides…</p><div class="ride-filters"><label>Show <select id="rideFilter"><option value="open">Open rides</option><option value="mine">My current ride</option><option value="history">Recent history</option></select></label><span id="rideCount"></span></div><div id="rideRows"></div>';
  const $=id=>document.getElementById(id),safe=esc;
  let commissionSummary=null,commissionSummaryAt=0;let rows=[],watch=null,online=false,loading=false,sending=false,lastSent=0,position=null,identity=null,sequence=0;
- let autoOnlineFor=null;let sampling=false;let locationTimer=null,requestVersion=0,knownRides=new Set(),firstRideLoad=true;
+ let desiredOnline=false;let autoOnlineFor=null;let sampling=false;let locationTimer=null,requestVersion=0,knownRides=new Set(),firstRideLoad=true;
  const labels={requested:'Waiting for a driver',accepted:'Driver on the way',arrived:'Driver arrived',in_progress:'Ride in progress',completed:'Completed',cancelled:'Cancelled'};
  function notice(text){$('rideNotice').textContent=text;dashboard();} function dashboard(){const fresh=online&&position&&Date.now()-position.at<60000;$('driverGPSState').textContent=!online?'Offline':fresh?'GPS connected':'Connecting GPS';$('driverPrecision').textContent=fresh?'Accuracy ±'+Math.round(position.accuracy)+' m · Synced '+(lastSent?new Date(lastSent).toLocaleTimeString():'soon'):'Keep this page open while online';$('driverOpenCount').textContent=rows.filter(r=>r.status==='requested').length;$('driverActiveCount').textContent=rows.filter(r=>r.driver_id===currentUser?.id&&['accepted','arrived','in_progress'].includes(r.status)).length;}
  function onlineUI(){ $('rideOnline').textContent=online?'● Online · Go offline':'Go online for rides';$('rideOnline').setAttribute('aria-pressed',String(online)); }
  async function rpc(name,args){const {data,error}=await supabaseClient.rpc(name,args);if(error)throw error;return data;}
  function stopLocal(){++sequence;if(watch!==null)navigator.geolocation.clearWatch(watch);watch=null;clearInterval(locationTimer);locationTimer=null;online=false;position=null;lastSent=0;onlineUI();dashboard();}
- async function offline(){stopLocal();try{await rpc('swiftride_presence',{p_online:false});notice('Offline for rides. Location sharing stopped.');}catch(e){notice('Location sharing stopped on this device. Could not update the server; availability expires within 90 seconds.');}await refresh();}
+ async function offline(){
+  try{await rpc('swiftride_driver_online',{p_online:false});desiredOnline=false;stopLocal();try{await rpc('swiftride_presence',{p_online:false});}catch{}notice('Offline. Ride alerts are turned off until you go online again.');await refresh();}
+  catch(e){notice('Could not turn off ride alerts: '+e.message+'. Please retry.');}
+ }
+ async function startOnline(save=true){
+  if(currentProfile?.role!=='driver')return;
+  if(save)await rpc('swiftride_driver_online',{p_online:true});
+  desiredOnline=true;online=true;onlineUI();
+  window.syncExistingPushSubscription?.();
+  if(!navigator.geolocation||!window.isSecureContext){notice('Online for ride alerts. Open HTTPS and allow GPS to appear as an available nearby driver.');return;}
+  const token=++sequence;notice('Online for ride alerts · Connecting GPS…');
+  if(watch!==null)navigator.geolocation.clearWatch(watch);clearInterval(locationTimer);
+  watch=navigator.geolocation.watchPosition(pos=>receivePosition(pos,token),err=>gpsError(err,token),{enableHighAccuracy:true,timeout:15000,maximumAge:0});sample();locationTimer=setInterval(sample,15000);
+ }
+
  async function publish(){
   if(!online||!position||sending)return;
   if(Date.now()-position.at>60000){notice('Refreshing GPS… Keep location permission enabled.');return;}
   const token=sequence;sending=true;
   try{await rpc('swift_driver_location',{p_lat:position.lat,p_lng:position.lng,p_accuracy:position.accuracy,p_observed_at:new Date(position.at).toISOString()});if(token===sequence){lastSent=Date.now();notice('Online · GPS updated '+new Date(lastSent).toLocaleTimeString()+'. Keep this page open while driving.');}}
   catch(e){if(token===sequence)notice('GPS could not sync: '+e.message);}
-  finally{sending=false;if(token!==sequence&&!online&&currentProfile?.role==='driver')rpc('swiftride_presence',{p_online:false}).catch(()=>{});}
+  finally{sending=false;if(token!==sequence&&!desiredOnline&&currentProfile?.role==='driver')rpc('swiftride_presence',{p_online:false}).catch(()=>{});}
  }
 
  function receivePosition(pos,token){if(token!==sequence||!online)return;if(pos.coords.accuracy>200){notice('Finding a precise location… Enable precise GPS or move outdoors.');return;}const at=Number(pos.timestamp);if(!Number.isFinite(at)||Date.now()-at>60000||(position&&at<position.at))return;position={lat:pos.coords.latitude,lng:pos.coords.longitude,accuracy:pos.coords.accuracy,at};if(Date.now()-lastSent>10000)publish().then(refresh);}
- function gpsError(err,token){if(token!==sequence)return;if(err.code===1)offline().then(()=>notice('Enable location permission to go online.'));else notice('Reconnecting GPS… Your last fresh location stays visible briefly.');}
- $('driverRetryGPS').onclick=()=>{if(online){sample();notice('Requesting a fresh GPS location…');}else $('rideOnline').onclick();};
+ function gpsError(err,token){if(token!==sequence)return;if(err.code===1){if(watch!==null)navigator.geolocation.clearWatch(watch);watch=null;clearInterval(locationTimer);locationTimer=null;notice('Still online for ride alerts. GPS permission is blocked; allow location and tap Refresh GPS to appear nearby.');}else notice('Still online for ride alerts · Reconnecting GPS…');}
+ $('driverRetryGPS').onclick=()=>{if(desiredOnline){startOnline(false).catch(e=>notice(e.message));}else $('rideOnline').onclick();};
  function sample(){if(!online||sampling)return;const token=sequence;sampling=true;navigator.geolocation.getCurrentPosition(pos=>{sampling=false;receivePosition(pos,token);},err=>{sampling=false;gpsError(err,token);},{enableHighAccuracy:true,timeout:12000,maximumAge:0});}
- $('rideOnline').onclick=async()=>{if(online)return offline();if(currentProfile?.role!=='driver')return;if(!navigator.geolocation||!window.isSecureContext){notice('Open the published HTTPS website and allow location access.');return;}online=true;onlineUI();const token=++sequence;notice('Connecting GPS… Allow location access.');watch=navigator.geolocation.watchPosition(pos=>receivePosition(pos,token),err=>gpsError(err,token),{enableHighAccuracy:true,timeout:15000,maximumAge:0});sample();locationTimer=setInterval(sample,15000);};
+ $('rideOnline').onclick=async()=>{if(desiredOnline)return offline();try{await startOnline(true);}catch(e){notice('Could not go online: '+e.message);}};
  $('driverEditProfile').onclick=()=>window.switchTab('profile');let vehicleLoadedFor=null;async function loadVehicle(){if(!currentUser||currentProfile?.role!=='driver'||vehicleLoadedFor===currentUser.id)return;const id=currentUser.id;vehicleLoadedFor=id;try{const info=await rpc('swift_worker_profile_v2');if(currentUser?.id===id){const photo=info.photo;const valid=typeof photo==='string'&&/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(photo);$('driverOwnPhoto').hidden=!valid;if(valid)$('driverOwnPhoto').src=photo;$('driverVehicle').textContent=[info.vehicle_model||info.application_vehicle,info.vehicle_color].filter(Boolean).join(' · ')||'Add vehicle details';}}catch{vehicleLoadedFor=null;}} window.addEventListener('swift-worker-profile-updated',()=>{vehicleLoadedFor=null;loadVehicle();});window.addEventListener('hashchange',()=>{vehicleLoadedFor=null;loadVehicle();});
  function driverFareCard(r){
   const f=r.pricing;if(!f)return '<p class="ride-money-note">Fare unavailable for this older ride.</p>';
@@ -468,15 +482,16 @@ renderOrders=function(){originalRenderOrders();if(currentProfile?.role!=='admin'
  }
  async function sync(){
   const id=currentUser?.id||null;
-  if(identity!==id){stopLocal();commissionSummary=null;commissionSummaryAt=0;autoOnlineFor=null;identity=id;rows=[];knownRides=new Set();firstRideLoad=true;draw();await refresh();}
-  $('rideOnline').hidden=currentProfile?.role!=='driver';if(id&&currentProfile?.role==='driver'&&autoOnlineFor!==id){autoOnlineFor=id;await $('rideOnline').onclick();}loadVehicle();dashboard();
+  if(identity!==id){stopLocal();desiredOnline=false;commissionSummary=null;commissionSummaryAt=0;autoOnlineFor=null;identity=id;rows=[];knownRides=new Set();firstRideLoad=true;draw();await refresh();}
+  $('rideOnline').hidden=currentProfile?.role!=='driver';if(id&&currentProfile?.role==='driver'&&autoOnlineFor!==id){autoOnlineFor=id;try{const preference=await rpc('swiftride_driver_online');if(preference.online)await startOnline(false);else notice('Offline for ride alerts. Tap Go online to resume.');}catch(e){autoOnlineFor=null;notice('Online preference could not load: '+e.message);}}loadVehicle();dashboard();
   if(!document.hidden&&currentUser)await refresh();
  }
  sync();setInterval(sync,5000);
  document.addEventListener('visibilitychange',()=>{if(!document.hidden){sample();refresh();}});
- // GPS cannot be guaranteed in a backgrounded mobile browser; the server expires old positions.
- window.addEventListener('pagehide',()=>{stopLocal();if(currentProfile?.role==='driver')rpc('swiftride_presence',{p_online:false}).catch(()=>{});});
- const logout=window.handleRunnerLogout;window.handleRunnerLogout=async function(){if(currentProfile?.role==='driver')await offline();return logout.apply(this,arguments);};
+ // GPS may expire in the background; the saved ride-alert preference does not.
+ window.addEventListener('pagehide',()=>{stopLocal();});
+ window.addEventListener('pageshow',()=>{if(currentProfile?.role==='driver'){autoOnlineFor=null;sync();}});
+ const logout=window.handleRunnerLogout;window.handleRunnerLogout=async function(){stopLocal();return logout.apply(this,arguments);};
 })();
 
 </script><script id="workforce-controller">
@@ -531,7 +546,7 @@ renderOrders=function(){originalRenderOrders();if(currentProfile?.role!=='admin'
  $('workerAppRows').onclick=async e=>{const b=e.target.closest('[data-review]');if(!b)return;const kind=$('workerAppRows').querySelector('[data-kind="'+b.dataset.user+'"]').value;if(!confirm((b.dataset.review==='approved'?'Approve as '+kind:'Reject / revoke access for')+' this account?'))return;b.disabled=true;try{await rpc('swift_worker_review',{p_user_id:b.dataset.user,p_status:b.dataset.review,p_kind:kind});await loadApps();}catch(e){$('workerAppsNotice').textContent=e.message;}finally{b.disabled=false;}};
  const originalAlerts=window.enableNotifications,originalSync=window.syncExistingPushSubscription;
  async function driverSubscription(prompt){if(currentProfile?.role!=='driver')return;if(!('Notification'in window)||!('serviceWorker'in navigator))throw Error('This phone does not support web push');if(prompt&&await Notification.requestPermission()!=='granted')throw Error('Notifications were not enabled');if(Notification.permission!=='granted')return;
-  const reg=await navigator.serviceWorker.register('./swiftshop-worker-sw.js',{scope:'./'});await navigator.serviceWorker.ready;let sub=await reg.pushManager.getSubscription();if(!sub&&prompt)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlBase64ToUint8Array(VAPID_PUBLIC_KEY)});if(sub)await rpc('swift_driver_save_push',{p_subscription:sub.toJSON()});
+  const reg=await navigator.serviceWorker.register('./swiftshop-worker-sw.js',{scope:'./'});await navigator.serviceWorker.ready;let sub=await reg.pushManager.getSubscription();if(!sub&&prompt)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlBase64ToUint8Array(VAPID_PUBLIC_KEY)});if(sub){await rpc('swiftride_driver_online',{p_subscription:sub.toJSON()});await rpc('swift_driver_save_push',{p_subscription:sub.toJSON()});}
  }
  window.enableNotifications=async function(){if(currentProfile?.role!=='driver')return originalAlerts();try{await driverSubscription(true);toast('This phone is linked for ride alerts.');}catch(e){toast(e.message);}};
  window.syncExistingPushSubscription=async function(){if(currentProfile?.role!=='driver')return originalSync();try{await driverSubscription(false);}catch{}};
