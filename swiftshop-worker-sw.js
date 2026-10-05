@@ -1,39 +1,5 @@
-/* Host beside SwiftShop-driver.html over HTTPS. Handles runner and driver push. */
-self.addEventListener('install', event => event.waitUntil(self.skipWaiting()));
-self.addEventListener('activate', event => event.waitUntil(self.clients.claim()));
-
-function notificationURL(value) {
-  const fallback = new URL('./SwiftShop-driver.html#rides', self.registration.scope);
-  try {
-    const url = new URL(value || fallback.href, self.registration.scope);
-    return url.origin === self.location.origin ? url.href : fallback.href;
-  } catch { return fallback.href; }
-}
-
-self.addEventListener('push', event => {
-  let payload = {};
-  try { payload = event.data ? event.data.json() : {}; }
-  catch { payload = { body: event.data?.text() || 'Open your portal to view the request.' }; }
-  payload = payload && typeof payload === 'object' ? payload : {};
-  event.waitUntil(self.registration.showNotification(payload.title || 'SwiftShop · New request', {
-    body: payload.body || 'Open your portal to view the request.',
-    tag: payload.tag || 'swiftshop-request',
-    icon: new URL('./logo.png', self.registration.scope).href,
-    data: { url: notificationURL(payload.url) }
-  }));
-});
-
-self.addEventListener('notificationclick', event => {
-  event.notification.close();
-  const url = notificationURL(event.notification.data?.url);
-  event.waitUntil((async () => {
-    const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
-    for (const client of windows) {
-      if (new URL(client.url).pathname === new URL(url).pathname) {
-        await client.navigate(url);
-        return client.focus();
-      }
-    }
-    return self.clients.openWindow(url);
-  })());
-});
+self.addEventListener('install',e=>e.waitUntil(self.skipWaiting()));
+self.addEventListener('activate',e=>e.waitUntil(self.clients.claim()));
+function notificationURL(value){const fallback=new URL('./index.html#dispatch',self.registration.scope);try{const u=new URL(value||fallback.href,self.registration.scope);return u.origin===self.location.origin?u.href:fallback.href;}catch{return fallback.href;}}
+self.addEventListener('push',e=>{let p={};try{p=e.data?.json()||{};}catch{p={body:'Open SwiftShop to see your update.'};}if(!p||typeof p!=='object')p={};e.waitUntil((async()=>{await self.registration.showNotification(p.title||'SwiftShop team update',{body:p.body||'Open your workspace for details.',tag:p.tag||'swiftshop-team-update',icon:new URL('./logo.png',self.registration.scope).href,badge:new URL('./icon-192.png',self.registration.scope).href,data:{url:notificationURL(p.url)}});for(const c of await self.clients.matchAll({type:'window',includeUncontrolled:true}))c.postMessage({type:'team-notification'});})());});
+self.addEventListener('notificationclick',e=>{e.notification.close();const url=notificationURL(e.notification.data?.url);e.waitUntil((async()=>{for(const c of await self.clients.matchAll({type:'window',includeUncontrolled:true})){if(new URL(c.url).origin===self.location.origin){await c.navigate(url);return c.focus();}}return self.clients.openWindow(url);})());});
