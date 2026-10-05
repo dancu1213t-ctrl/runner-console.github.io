@@ -5,7 +5,26 @@
  document.body.append(dialog);$('teamAlertClose').onclick=()=>dialog.close();dialog.addEventListener('click',e=>{if(e.target===dialog)dialog.close();});
  const bell=$('notifyButton');bell.textContent='Notifications';const badge=document.createElement('span');badge.id='teamAlertCount';badge.hidden=true;bell.append(badge);bell.onclick=()=>{dialog.showModal();load();};
  const sound=$('teamAlertSound');sound.onchange=()=>{if(owner)localStorage.setItem('team.sound.'+owner,String(sound.checked));if(sound.checked)initAudioContext();};
- async function rpc(name,args){const {data,error}=await supabaseClient.rpc(name,args).abortSignal(AbortSignal.timeout(12000));if(error)throw error;return data;}
+ async function rpc(name,args={}){
+  const uid=currentUser?.id;if(!uid)throw Error('Please sign in to load your notifications.');
+  async function token(refresh=false){
+   const {data,error}=refresh?await supabaseClient.auth.refreshSession():await supabaseClient.auth.getSession();
+   if(error)throw error;
+   const session=data.session;
+   if(currentUser?.id!==uid||session?.user?.id!==uid||!session?.access_token)throw Error('Your session needs to reconnect. Please sign in again.');
+   if(!refresh&&session.expires_at&&session.expires_at*1000<=Date.now()+60000)return token(true);
+   return session.access_token;
+  }
+  async function send(accessToken){
+   const response=await fetch(SUPABASE_URL+'/rest/v1/rpc/'+name,{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+accessToken,'Content-Type':'application/json'},body:JSON.stringify(args),signal:AbortSignal.timeout(12000)});
+   const data=await response.json().catch(()=>null);return {response,data};
+  }
+  let result=await send(await token());
+  if(result.response.status===401||result.response.status===403&&result.data?.code==='42501')result=await send(await token(true));
+  if(currentUser?.id!==uid)throw Error('The signed-in account changed.');
+  if(!result.response.ok){const error=Error(result.data?.message||'Notifications could not connect. Please try again.');error.code=result.data?.code;throw error;}
+  return result.data;
+ }
  async function registerTeamSubscription(reg){let subscription=await reg.pushManager.getSubscription();if(!subscription)subscription=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlBase64ToUint8Array(VAPID_PUBLIC_KEY)});await rpc('swift_team_save_push',{p_subscription:subscription.toJSON()});return subscription;}
  const originalEnable=window.enableNotifications;
  window.enableNotifications=async()=>{
@@ -28,11 +47,11 @@
  window.syncExistingPushSubscription=async()=>{await originalSync();if(!currentUser||!('Notification'in window)||Notification.permission!=='granted')return;try{const reg=await navigator.serviceWorker.ready;const subscription=await reg.pushManager.getSubscription();if(subscription)await rpc('swift_team_save_push',{p_subscription:subscription.toJSON()});}catch{}};
  async function load(){
   if(!currentUser||busy)return;busy=true;const uid=currentUser.id;
-  try{const rows=await rpc('swift_team_notifications');if(uid!==currentUser?.id)return;const unread=rows.filter(r=>!r.read_at).length;badge.hidden=!unread;badge.textContent=unread>99?'99+':String(unread);bell.setAttribute('aria-label',unread+' unread notifications');
+  try{const rows=await rpc('swift_team_notifications');if(uid!==currentUser?.id)return;if($('teamAlertStatus').textContent.startsWith('Inbox could not load.'))$('teamAlertStatus').textContent='Notifications are up to date.';const unread=rows.filter(r=>!r.read_at).length;badge.hidden=!unread;badge.textContent=unread>99?'99+':String(unread);bell.setAttribute('aria-label',unread+' unread notifications');
    const fresh=rows.filter(r=>!lastSeen.has(r.id)&&!r.read_at);if(baseline&&fresh.length){toast(fresh.length===1?fresh[0].title:fresh.length+' new team updates');if(sound.checked){initAudioContext();playBeepSound();}}
    lastSeen=new Set(rows.map(r=>r.id));baseline=true;
    const list=$('teamAlertRows');list.replaceChildren();for(const r of rows){const b=document.createElement('button');b.type='button';b.className='team-alert-row'+(!r.read_at?' unread':'');const title=document.createElement('strong'),body=document.createElement('span'),time=document.createElement('small');title.textContent=r.title;body.textContent=r.body;time.textContent=new Date(r.created_at).toLocaleString();b.append(title,body,time);b.onclick=async()=>{try{await rpc('swift_team_mark_read',{p_id:r.id});dialog.close();window.switchTab(r.page);await load();}catch(e){$('teamAlertStatus').textContent=e.message;}};list.append(b);}if(!rows.length){const p=document.createElement('p');p.className='team-alert-notice';p.textContent='You’re all caught up. New activity will appear here.';list.append(p);}
-  }catch(e){$('teamAlertStatus').textContent='Inbox could not load. If this is the first setup, install the team-notification SQL and sender. '+e.message;}
+  }catch(e){if(uid===currentUser?.id)$('teamAlertStatus').textContent='Inbox could not load. '+e.message;}
   finally{busy=false;}
  }
  $('teamMarkRead').onclick=async()=>{try{await rpc('swift_team_mark_read',{p_id:null});await load();}catch(e){$('teamAlertStatus').textContent=e.message;}};
