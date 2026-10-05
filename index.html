@@ -517,7 +517,7 @@ renderOrders=function(){originalRenderOrders();if(currentProfile?.role!=='admin'
   catch(e){notice(/swiftride|schema cache|does not exist/i.test(e.message)?'Rides setup is pending. Run SwiftRide-setup.sql in Supabase, then refresh.':'Could not load rides: '+e.message);}
   finally{loading=false;}
  }
- $('rideRefresh').onclick=refresh;$('rideFilter').onchange=draw;
+ document.addEventListener('swift-completion-confirmed',refresh);$('rideRefresh').onclick=refresh;$('rideFilter').onchange=draw;
  $('rideRows').onclick=async event=>{
   const btn=event.target.closest('button');if(!btn)return;
   if(btn.dataset.map){showMap(btn.dataset.map,true);return;}
@@ -744,3 +744,4 @@ renderOrders=function(){originalRenderOrders();if(currentProfile?.role!=='admin'
 <script src="runner-receipts.js?v=orders2"></script>
 <script src="team-auth.js?v=auth6"></script>
 
+<link rel="stylesheet" href="team-scanner.css?v=qr1"><script src="jsqr.js?v=1.4.0"></script><script src="team-scanner.js?v=qr1"></script>
