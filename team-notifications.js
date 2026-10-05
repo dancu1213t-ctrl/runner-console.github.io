@@ -17,7 +17,7 @@
    const reg=await navigator.serviceWorker.register('./swiftshop-worker-sw.js',{scope:'./'});await navigator.serviceWorker.ready;
    await registerTeamSubscription(reg);
    // Preserve the existing offer senders as well as new team activity alerts.
-   if(currentProfile.role==='runner')await originalEnable();
+   if(currentProfile.role==='runner'){const subscription=await reg.pushManager.getSubscription();await rpc('save_push_subscription',{p_subscription:subscription.toJSON()});}
    if(currentProfile.role==='driver'){const subscription=await reg.pushManager.getSubscription();await rpc('swift_driver_save_push',{p_subscription:subscription.toJSON()});}
    $('teamAlertStatus').textContent='This device is linked. Enable alerts separately on your phone and laptop.';b.textContent='Alerts enabled on this device';
   }catch(e){$('teamAlertStatus').textContent='Could not enable alerts: '+e.message;}
