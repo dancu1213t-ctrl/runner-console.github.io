@@ -33,6 +33,7 @@
  $('[data-image]').onchange=async e=>{if(processing)return;reset();const file=e.target.files?.[0];e.target.value='';if(!file)return;const token=version;try{if(file.size>12*1024*1024)throw Error('Choose an image smaller than 12 MB.');const image=await createImageBitmap(file);let text;try{text=decode(image,image.width,image.height);}finally{image.close();}if(token!==version||!dialog.open)return;if(!text)throw Error('No readable QR code found. Try a clearer image.');await scanned(text);}catch(e){$('[data-status]').textContent=e.message;}};
  $('[data-confirm]').onclick=async()=>{if(!payload||processing)return;processing=true;$('[data-confirm]').disabled=true;try{const data=await rpc({p_payload:payload,p_complete:true});identify(data);$('[data-status]').textContent=data.kind==='ride'?'Ride completion confirmed.':'Delivery handoff confirmed.';$('[data-confirm]').textContent='Completion recorded';if(typeof fetchOrders==='function')fetchOrders();document.dispatchEvent(new Event('swift-completion-confirmed'));}catch(e){$('[data-status]').textContent=e.message;$('[data-confirm]').disabled=false;}finally{processing=false;}};
  const init=window.initDashboard;window.initDashboard=function(){const result=init.apply(this,arguments);button.hidden=!eligible();return result;};
+ button.hidden=!eligible();
  document.addEventListener('visibilitychange',()=>{if(document.hidden)stop();});
  const logout=window.handleRunnerLogout;window.handleRunnerLogout=async function(){if(dialog.open)dialog.close();reset();button.hidden=true;return logout.apply(this,arguments);};
 })();
