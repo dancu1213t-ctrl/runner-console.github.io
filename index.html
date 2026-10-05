@@ -266,7 +266,7 @@ async function resolveDirectionsLink(value){
  if(['maps.app.goo.gl','goo.gl'].includes(url.hostname)){
   if(directionsLinkCache.has(raw))expanded=directionsLinkCache.get(raw);
   else{
-   const {data,error}=await supabaseClient.functions.invoke('resolve-map-link',{body:{url:raw}});
+   const {data,error}=await supabaseClient.functions.invoke('resolve-map-link',{body:{url:raw},signal:AbortSignal.timeout(12000)});
    if(error){let message='Could not open this Maps share link. Check your connection and sign-in, then retry.';try{const detail=await error.context?.json();if(detail?.error)message=detail.error;}catch{}throw new Error(message);}
    if(data?.error||!data?.url)throw new Error(data?.error||'Google did not return directions for this link.');
    expanded=data.url;
@@ -282,7 +282,25 @@ function routeLocation(value){const match=value.match(/^(-?\d+(?:\.\d+)?)\s*,\s*
 function readDispatchDetails(){return {dropoff_location:document.getElementById('runLocation').value.trim(),route_type:'delivery',route_notes:document.getElementById('routeNotes').value.trim(),is_paid:document.getElementById('isPaid').checked};}
 
 window.resolveDirectionsLink=resolveDirectionsLink;
-  async function dispatchRun(){const name=document.getElementById('customerName').value.trim(),phone=document.getElementById('customerPhone').value.trim(),items=document.getElementById('runItems').value.trim(),location=document.getElementById('runLocation').value.trim(),pay=Number(document.getElementById('runPay').value||0),priority=document.getElementById('runPriority').value,paymentMethod=document.getElementById('paymentMethod').value;if(!name||!items)return toast('Add at least the customer name and run brief.');let resolvedRoute;try{resolvedRoute=await resolveDirectionsLink(location);}catch(error){return toast(error.message);}const {error}=await supabaseClient.rpc('dispatch_run',{p_customer_name:name,p_phone:phone,p_run_brief:items+'\n[SWIFTSHOP_DETAILS]'+JSON.stringify({...readDispatchDetails(),dropoff_location:resolvedRoute.url}),p_location:resolvedRoute.url,p_runner_pay:pay,p_priority:priority,p_payment_method:paymentMethod});if(error)return toast('Could not dispatch: '+error.message);['customerName','customerPhone','runItems','runLocation','routeNotes'].forEach(x=>document.getElementById(x).value='');document.getElementById('isPaid').checked=false;toast('Run broadcast to available runners.');fetchOrders()}
+  let dispatchSending=false;
+  async function dispatchRun(){
+    if(dispatchSending)return;
+    const field=id=>document.getElementById(id);
+    const name=field('customerName').value.trim(),phone=field('customerPhone').value.trim(),items=field('runItems').value.trim(),location=field('runLocation').value.trim(),pay=Number(field('runPay').value||0),priority=field('runPriority').value,paymentMethod=field('paymentMethod').value;
+    if(!name||!items)return toast('Add at least the customer name and run brief.');
+    const details=readDispatchDetails(),button=document.querySelector('button[onclick="dispatchRun()"]'),desk=field('dispatchEditor'),previousInert=desk?.inert;
+    const label=button?.textContent;dispatchSending=true;if(button){button.disabled=true;button.textContent='Sending to runners…';}if(desk)desk.inert=true;
+    try{
+      const resolvedRoute=await resolveDirectionsLink(location);
+      const {data,error}=await supabaseClient.rpc('dispatch_run',{p_customer_name:name,p_phone:phone,p_run_brief:items+'\n[SWIFTSHOP_DETAILS]'+JSON.stringify({...details,dropoff_location:resolvedRoute.url}),p_location:resolvedRoute.url,p_runner_pay:pay,p_priority:priority,p_payment_method:paymentMethod}).abortSignal(AbortSignal.timeout(12000));
+      if(error)throw error;
+      if(!data?.order_id)throw Error('Dispatch receipt was not confirmed. Refresh the order desk before retrying.');
+      ['customerName','customerPhone','runItems','runLocation','routeNotes'].forEach(id=>field(id).value='');field('isPaid').checked=false;
+      window.dispatchEvent(new CustomEvent('swift-run-dispatched',{detail:{orderId:data.order_id,trackingId:details.customer_tracking_id||null}}));
+      toast('Run broadcast to available runners.');fetchOrders();
+    }catch(error){toast('Could not confirm dispatch: '+(error.message||'Please check your connection.')+' Refresh the order desk before retrying.');}
+    finally{dispatchSending=false;if(button){button.disabled=false;button.textContent=label;}if(desk)desk.inert=previousInert;}
+  }
   window.addEventListener('click',initAudioContext,{once:true});window.addEventListener('DOMContentLoaded',async()=>{const {data:{session}}=await supabaseClient.auth.getSession();if(session)await loadSignedInUser(session.user);});
 </script>
 <style>.dispatch-input{width:100%;border-radius:1rem;padding:.8rem 1rem;background:rgba(255,255,255,.96);color:#16332e;font-size:.8rem;font-weight:700;outline:none}.dispatch-input:focus{box-shadow:0 0 0 3px rgba(110,231,183,.38)}.tab{white-space:nowrap;padding:.65rem .85rem;border-radius:.8rem;background:#f8fafc;border:1px solid #e2e8f0;font-size:.7rem;font-weight:800;color:#64748b}.tab b{margin-left:.3rem;background:#e2e8f0;padding:.1rem .38rem;border-radius:999px;font-size:.6rem}.active-tab{background:#062f2b;color:#fff;border-color:#062f2b}.active-tab b{background:#34d399;color:#052e28}.mini{font-size:.68rem;font-weight:800;border:1px solid #e2e8f0;padding:.45rem .65rem;border-radius:.65rem;background:#fff;color:#475569}.admin-runner-scroll{overflow-x:auto}.admin-runner-table{width:100%;min-width:780px;border-collapse:collapse;font-size:.78rem}.admin-runner-table th{padding:.8rem 1.5rem;background:#f8fafc;color:#64748b;text-align:left;text-transform:uppercase;letter-spacing:.08em;font-size:.6rem;font-weight:800}.admin-runner-table td{padding:1rem 1.5rem;border-top:1px solid #f1f5f9;color:#475569}.admin-runner-empty{text-align:center!important;padding:2rem!important;color:#94a3b8!important}.runner-state{display:inline-flex;align-items:center;gap:.4rem;border-radius:999px;padding:.33rem .55rem;font-size:.63rem;font-weight:800}.runner-state i{width:.42rem;height:.42rem;border-radius:50%;display:inline-block}.runner-state--active{color:#047857;background:#ecfdf5}.runner-state--active i{background:#10b981;box-shadow:0 0 0 3px #d1fae5}.runner-state--away{color:#64748b;background:#f1f5f9}.runner-state--away i{background:#94a3b8}</style>
@@ -421,6 +439,7 @@ renderOrders=function(){originalRenderOrders();if(currentProfile?.role!=='admin'
   }
   button.disabled=true;try{const {error}=await supabaseClient.rpc('set_customer_preparation',{p_id:r.id,p_phase:button.dataset.action});if(error)throw error;await refresh();}catch(error){field('trackingAdminNotice').textContent=error.message;}finally{button.disabled=false;}
  });field('refreshCustomerRequests').onclick=refresh;window.refreshTeamRequests=refresh;
+ window.addEventListener('swift-run-dispatched',event=>{if(event.detail?.trackingId===selectedId)clear();refresh();});
  const contact=document.createElement('details');contact.className='tracking-contact';contact.hidden=true;contact.innerHTML='<summary>Your runner profile</summary><p>Customers see this phone number only after you accept their run.</p><label for="runnerDeliveryPhone">Phone with country code</label><input id="runnerDeliveryPhone" type="tel" placeholder="501…" autocomplete="tel"><button type="button" id="saveDeliveryPhone">Save contact</button><span id="deliveryPhoneNotice" role="status"></span>';document.getElementById('runnerWorkboard').prepend(contact);
  field('saveDeliveryPhone').onclick=async()=>{const button=field('saveDeliveryPhone');button.disabled=true;try{const phone=field('runnerDeliveryPhone').value.replace(/[\s()-]/g,'');const {error}=await supabaseClient.rpc('set_runner_delivery_contact',{p_phone:phone});if(error)throw error;field('deliveryPhoneNotice').textContent='Saved. Assigned customers can call you.';}catch(error){field('deliveryPhoneNotice').textContent=error.message;}finally{button.disabled=false;}};
  const photoBox=document.createElement('div');photoBox.className='runner-photo-settings';photoBox.innerHTML='<div class="runner-photo-preview"><img id="runnerPhotoPreview" alt="Your runner profile photo" hidden><span id="runnerPhotoPlaceholder">Photo</span></div><div><label for="runnerPhotoFile">Profile photo</label><p>Saved to your account on every phone. Shown to customers when you accept their order.</p><input id="runnerPhotoFile" type="file" accept="image/jpeg,image/png,image/webp"><div class="runner-photo-actions"><button id="saveRunnerPhoto" type="button" disabled>Save photo</button><button id="removeRunnerPhoto" type="button" hidden>Remove photo</button></div><span id="runnerPhotoNotice" role="status"></span></div>';contact.append(photoBox);
@@ -739,7 +758,7 @@ renderOrders=function(){originalRenderOrders();if(currentProfile?.role!=='admin'
 #serviceZoneDialog{padding:22px!important;width:min(900px,calc(100vw - 24px))!important;max-height:calc(100dvh - 24px)!important;overflow:auto!important;margin:auto!important}#serviceZoneDialog h2{font-size:20px;font-weight:600}#serviceZoneDialog p{font-size:12px;line-height:1.7;color:#73806e;margin:12px 0}.zone-tools{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.zone-tools input{width:240px!important;margin:0!important}.zone-tools button{border:1px solid #dfe6dc;border-radius:7px;padding:9px 12px;font-size:12px;background:#fff;color:#354936}#serviceZoneMap{height:400px;min-height:260px;background:#f0f3ed;border-radius:9px}#serviceZoneMap button{all:revert}#zoneSave{background:#354936;color:#fff}#zoneNotice{overflow-wrap:anywhere}
 </style></body></html>
 <script src="team-ui.js?v=orders2"></script>
-<script src="team-notifications.js?v=orders2"></script>
+<script src="team-notifications.js?v=session3"></script>
 
 <script src="runner-receipts.js?v=orders2"></script>
 <script src="team-auth.js?v=auth6"></script>
