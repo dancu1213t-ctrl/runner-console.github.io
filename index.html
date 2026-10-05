@@ -598,10 +598,30 @@ renderOrders=function(){originalRenderOrders();if(currentProfile?.role!=='admin'
   }catch(e){toast('Could not check account approval: '+e.message);}
  };
  $('workerCheck').onclick=()=>pendingUser&&window.loadSignedInUser(pendingUser);
+ let applicationDraft=null;
+ const confirmApply=document.createElement('form');confirmApply.hidden=true;confirmApply.id='workerConfirmApply';
+ confirmApply.innerHTML='<h2>Confirm your email</h2><p>Enter the email code to finish sending your application.</p><label>Email code<input name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6,8}" minlength="6" maxlength="8" required></label><button type="submit">Verify & send application</button><p id="workerConfirmNotice" role="status"></p>';
+ shell.append(confirmApply);
+ async function finishApplication(user){
+  const f=applicationDraft;
+  const result=await rpc('swift_worker_apply_verified',{p_kind:f.kind,p_name:f.full_name.trim(),p_phone:f.phone.trim(),p_vehicle:f.vehicle.trim()});
+  if(!result||result.user_id!==user.id||result.kind!==f.kind)throw new Error('Application was not confirmed. Please try again.');
+  confirmApply.hidden=true;applicationDraft=null;await window.loadSignedInUser(user);
+ }
+ confirmApply.onsubmit=async e=>{e.preventDefault();const b=confirmApply.querySelector('button');b.disabled=true;try{
+  const {data,error}=await supabaseClient.auth.verifyOtp({email:applicationDraft.email,token:confirmApply.elements.code.value.trim(),type:'email'});if(error)throw error;
+  if(!data?.user||!data?.session)throw new Error('Email verification did not complete. Try again.');
+  await finishApplication(data.user);
+ }catch(e){$('workerConfirmNotice').textContent=e.message;}finally{b.disabled=false;}};
  apply.onsubmit=async e=>{e.preventDefault();const b=apply.querySelector('[type=submit]');b.disabled=true;$('workerApplyNotice').textContent='Sending application…';
   try{const f=Object.fromEntries(new FormData(apply));const redirect=/^https?:$/.test(location.protocol)?location.origin+location.pathname:undefined;
    const {data,error}=await supabaseClient.auth.signUp({email:f.email.trim(),password:f.password,options:{emailRedirectTo:redirect,data:{swift_worker_application:true,worker_kind:f.kind,full_name:f.full_name.trim(),phone:f.phone.trim(),vehicle:f.vehicle.trim()}}});if(error)throw error;apply.elements.password.value='';
-   if(data.session)await window.loadSignedInUser(data.user);else $('workerApplyNotice').textContent='Check your email to confirm your account, then sign in to see your application status. Admin approval is required before you can work.';
+   applicationDraft={...f,email:f.email.trim()};delete applicationDraft.password;
+   if(data.session)await finishApplication(data.user);else{
+    if(data.user?.identities?.length===0){const {error:codeError}=await supabaseClient.auth.signInWithOtp({email:applicationDraft.email,options:{shouldCreateUser:false}});if(codeError)throw codeError;}
+    confirmApply.elements.code.value='';confirmApply.hidden=false;
+    $('workerApplyNotice').textContent='Check your email for the code, then enter it below to confirm your application. Admin approval is still required.';
+   }
   }catch(e){$('workerApplyNotice').textContent=e.message;}finally{b.disabled=false;}
  };
  const profile=$('workerProfilePanel');profile.innerHTML='<h2>Your public profile</h2><p>Your public details.</p><div class="worker-photo-wrap"><img id="workerPhoto" alt="Your profile photo" hidden><span id="workerPhotoPlaceholder">Add your photo</span></div><form id="workerProfileForm"><label>Contact phone<input id="workerPhone" type="tel" minlength="7" maxlength="30" required></label><label>Profile photo<input id="workerPhotoFile" type="file" accept="image/jpeg,image/png,image/webp"></label><fieldset id="workerVehicle"><legend>Your vehicle</legend><label>Vehicle type<select id="workerVehicleType"><option value="car">Car</option><option value="motorcycle">Motorcycle · 1 passenger</option></select></label><label>Make and model<input id="workerVehicleModel" maxlength="100" placeholder="Chevy Equinox"></label><label>Color<input id="workerVehicleColor" maxlength="40" placeholder="White"></label><label>License plate number<input id="workerLicensePlate" maxlength="20" pattern="[A-Za-z0-9 -]+" placeholder="ABC 123" autocapitalize="characters" spellcheck="false"></label><label>Passenger seats<input id="workerVehicleSeats" type="number" min="1" max="8" value="4"></label><label>Vehicle photo<input id="workerCarPhotoFile" type="file" accept="image/png,image/jpeg,image/webp"></label><p style="font-size:12px">PNG for transparency. JPG and WebP also supported.</p><img id="workerCarPhotoPreview" alt="Your vehicle" hidden style="width:100%;max-height:180px;object-fit:contain"><button type="button" id="workerCarPhotoRemove">Remove vehicle photo</button></fieldset><div class="worker-profile-actions"><button type="submit">Save profile</button><button type="button" id="workerRemovePhoto">Remove photo</button></div><p id="workerProfileNotice" role="status"></p></form>';
