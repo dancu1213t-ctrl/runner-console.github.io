@@ -3,7 +3,7 @@
  const dialog=document.createElement('dialog');dialog.className='team-alert-dialog';dialog.id='teamAlertDialog';dialog.setAttribute('aria-labelledby','teamAlertTitle');
  dialog.innerHTML='<div class="team-alert-header"><h2 id="teamAlertTitle">Notifications</h2><button id="teamAlertClose" type="button" aria-label="Close notifications">✕</button></div><p class="team-alert-notice">Order arrivals, delivery progress, rides, applications and payment activity—all in one place.</p><button id="teamEnableAlerts" type="button">Enable alerts on this device</button><label class="team-alert-settings"><input id="teamAlertSound" type="checkbox">Play a sound for new activity while this page is open</label><p id="teamAlertStatus" class="team-alert-notice" role="status"></p><button id="teamMarkRead" type="button">Mark all as read</button><div id="teamAlertRows"></div>';
  document.body.append(dialog);$('teamAlertClose').onclick=()=>dialog.close();dialog.addEventListener('click',e=>{if(e.target===dialog)dialog.close();});
- const bell=$('notifyButton');bell.textContent='Notifications';const badge=document.createElement('span');badge.id='teamAlertCount';badge.hidden=true;bell.append(badge);bell.onclick=()=>{dialog.showModal();load();};
+ const bell=$('notifyButton');bell.textContent='Notifications';const badge=document.createElement('span');badge.id='teamAlertCount';badge.hidden=true;bell.append(badge);bell.onclick=()=>{dialog.showModal();window.syncExistingPushSubscription();load();};
  const sound=$('teamAlertSound');sound.onchange=()=>{if(owner)localStorage.setItem('team.sound.'+owner,String(sound.checked));if(sound.checked)initAudioContext();};
  async function rpc(name,args={}){
   const uid=currentUser?.id;if(!uid)throw Error('Please sign in to load your notifications.');
@@ -38,13 +38,27 @@
    // Preserve the existing offer senders as well as new team activity alerts.
    if(currentProfile.role==='runner'){const subscription=await reg.pushManager.getSubscription();await rpc('save_push_subscription',{p_subscription:subscription.toJSON()});}
    if(currentProfile.role==='driver'){const subscription=await reg.pushManager.getSubscription();await rpc('swift_driver_save_push',{p_subscription:subscription.toJSON()});}
-   $('teamAlertStatus').textContent='This device is linked. Enable alerts separately on your phone and laptop.';b.textContent='Alerts enabled on this device';
+   $('teamAlertStatus').textContent='This device is linked. Enable alerts separately on your phone and laptop.';b.textContent='Alerts enabled on this device';b.dataset.linked='true';
   }catch(e){$('teamAlertStatus').textContent='Could not enable alerts: '+e.message;}
-  finally{b.disabled=false;}
+  finally{b.disabled=b.dataset.linked==='true';}
  };
  $('teamEnableAlerts').onclick=()=>window.enableNotifications();
- const originalSync=window.syncExistingPushSubscription;
- window.syncExistingPushSubscription=async()=>{await originalSync();if(!currentUser||!('Notification'in window)||Notification.permission!=='granted')return;try{const reg=await navigator.serviceWorker.ready;const subscription=await reg.pushManager.getSubscription();if(subscription)await rpc('swift_team_save_push',{p_subscription:subscription.toJSON()});}catch{}};
+ let pushSyncBusy=false;
+ window.syncExistingPushSubscription=async()=>{
+  if(pushSyncBusy||!currentUser||!currentProfile?.active)return;pushSyncBusy=true;const uid=currentUser.id,b=$('teamEnableAlerts');
+  try{
+   if(!('Notification'in window)||!('serviceWorker'in navigator)||!('PushManager'in window)||Notification.permission!=='granted'){b.dataset.linked='false';b.disabled=false;b.textContent=typeof Notification!=='undefined'&&Notification.permission==='denied'?'Notifications blocked — check device settings':'Enable alerts on this device';return;}
+   const reg=await navigator.serviceWorker.getRegistration('./'),subscription=await reg?.pushManager.getSubscription();
+   if(!subscription){b.dataset.linked='false';b.disabled=false;b.textContent='Enable alerts on this device';return;}
+   await rpc('swift_team_save_push',{p_subscription:subscription.toJSON()});
+   if(currentProfile.role==='runner')await rpc('save_push_subscription',{p_subscription:subscription.toJSON()});
+   if(currentProfile.role==='driver')await rpc('swift_driver_save_push',{p_subscription:subscription.toJSON()});
+   if(currentUser?.id!==uid)return;
+   b.dataset.linked='true';b.textContent='Alerts enabled on this device';b.disabled=true;
+   if(!$('teamAlertStatus').textContent.startsWith('Inbox could not load.'))$('teamAlertStatus').textContent='This device is linked for background notifications.';
+  }catch(e){if(currentUser?.id===uid){b.dataset.linked='false';b.disabled=false;b.textContent='Retry notification connection';$('teamAlertStatus').textContent='Could not reconnect alerts: '+e.message;}}
+  finally{pushSyncBusy=false;}
+ };
  async function load(){
   if(!currentUser||busy)return;busy=true;const uid=currentUser.id;
   try{const rows=await rpc('swift_team_notifications');if(uid!==currentUser?.id)return;if($('teamAlertStatus').textContent.startsWith('Inbox could not load.'))$('teamAlertStatus').textContent='Notifications are up to date.';const unread=rows.filter(r=>!r.read_at).length;badge.hidden=!unread;badge.textContent=unread>99?'99+':String(unread);bell.setAttribute('aria-label',unread+' unread notifications');
@@ -55,8 +69,8 @@
   finally{busy=false;}
  }
  $('teamMarkRead').onclick=async()=>{try{await rpc('swift_team_mark_read',{p_id:null});await load();}catch(e){$('teamAlertStatus').textContent=e.message;}};
- const oldInit=window.initDashboard;window.initDashboard=function(){const result=oldInit.apply(this,arguments);if(owner!==currentUser?.id){owner=currentUser?.id||'';baseline=false;lastSeen=new Set();sound.checked=localStorage.getItem('team.sound.'+owner)==='true';}clearInterval(timer);load();timer=setInterval(()=>{if(!document.hidden)load();},6000);return result;};
- document.addEventListener('visibilitychange',()=>{if(!document.hidden)load();});window.addEventListener('online',load);
+ const oldInit=window.initDashboard;window.initDashboard=function(){const result=oldInit.apply(this,arguments);if(owner!==currentUser?.id){owner=currentUser?.id||'';baseline=false;lastSeen=new Set();sound.checked=localStorage.getItem('team.sound.'+owner)==='true';}clearInterval(timer);window.syncExistingPushSubscription();load();timer=setInterval(()=>{if(!document.hidden)load();},6000);return result;};
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden){window.syncExistingPushSubscription();load();}});window.addEventListener('online',()=>{window.syncExistingPushSubscription();load();});
  navigator.serviceWorker?.addEventListener('message',e=>{if(e.data?.type==='team-notification')load();});
  const oldLogout=window.handleRunnerLogout;window.handleRunnerLogout=async()=>{clearInterval(timer);try{if('serviceWorker'in navigator){const reg=await navigator.serviceWorker.getRegistration('./');const subscription=await reg?.pushManager.getSubscription();if(subscription){try{await rpc('swift_team_remove_push',{p_endpoint:subscription.endpoint});}finally{await subscription.unsubscribe();}}}}catch{}return oldLogout();};
 })();
