@@ -560,6 +560,7 @@ renderOrders=function(){originalRenderOrders();if(currentProfile?.role!=='admin'
   const btn=event.target.closest('button');if(!btn)return;
   if(btn.dataset.map){showMap(btn.dataset.map,true);return;}
   if(!btn.dataset.action)return;
+  if(btn.dataset.action==='cancel'&&!confirm('Cancel this ride request?'))return;
   await performRideAction(btn.dataset.id,btn.dataset.action,btn);
  };
  async function performRideAction(id,action,btn){
