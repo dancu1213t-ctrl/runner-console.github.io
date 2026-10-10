@@ -1,0 +1,48 @@
+:root{--driver-ink:#202b25;--driver-orange:#ff6a00}
+#swiftRidePanel .driver-commission-block{padding:24px!important;background:linear-gradient(135deg,#20392d,#14241b)!important;color:#fff!important;border:0!important;border-radius:24px!important;box-shadow:0 12px 30px #1833221a}
+#swiftRidePanel .driver-commission-block h3{color:#fbc397!important;font-size:12px!important;text-transform:uppercase;letter-spacing:.12em}
+#swiftRidePanel #rideCommissionToday{color:#e3ece5!important;font-size:14px!important;line-height:1.8!important}
+.driver-presence-original{display:none!important}
+#driverPresenceSlider{width:min(100%,370px);box-sizing:border-box}
+#driverPresenceSlider[hidden]{display:none}
+.driver-presence-caption{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;margin-bottom:10px}
+.driver-presence-caption i{width:9px;height:9px;border-radius:50%;background:#929c95}
+.driver-presence-caption i.active{background:#278654;box-shadow:0 0 0 4px #27865418}
+.driver-slide{position:relative;display:block;height:60px;border-radius:32px;background:#213e2e;color:white;overflow:hidden;margin:10px 0;box-sizing:border-box}
+.driver-slide>span{position:absolute;inset:0;display:grid;place-items:center;font:700 14px Manrope,sans-serif;pointer-events:none;padding-left:32px}
+.driver-slide input{position:absolute;inset:5px;margin:0!important;width:calc(100% - 10px)!important;height:50px!important;appearance:none;-webkit-appearance:none;background:transparent!important;border:0!important;padding:0!important;cursor:grab;touch-action:pan-y;box-shadow:none!important}
+.driver-slide input::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:50px;height:50px;border-radius:50%;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M5 12h14m-6-6 6 6-6 6' fill='none' stroke='%23213e2e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/24px no-repeat;box-shadow:0 2px 8px #0002}
+.driver-slide input::-moz-range-thumb{width:50px;height:50px;border:0;border-radius:50%;background:#fff;box-shadow:0 2px 8px #0002}
+.driver-slide-cancel{background:#f9ece8;color:#a03f2e;border:1px solid #efd2c9}
+.driver-slide input:focus-visible{outline:3px solid #ff963e;outline-offset:-3px;border-radius:30px}
+.driver-slide:has(input:disabled){opacity:.65}
+#swiftRidePanel .ride-card{border:1px solid #e0e6df!important;background:#fff!important;border-radius:24px!important;padding:24px!important;box-shadow:0 6px 24px #20392d08}
+#swiftRidePanel .ride-card-top h3{font-size:22px!important}
+#swiftRidePanel .ride-card-top>span{border-radius:20px;background:#fff0e3;padding:7px 12px;color:#9d4b12;font-size:11px}
+#swiftRidePanel .ride-money{border:0!important;border-radius:20px!important;background:#f1f5ee!important;padding:22px!important}
+#swiftRidePanel .ride-money-lead strong{font-size:34px!important}
+#swiftRideMap{width:min(1000px,calc(100% - 32px))!important;max-width:1000px!important;max-height:calc(100dvh - 32px)!important;padding:26px!important;border:0!important;border-radius:30px!important;color:#202b25;background:#fff;box-sizing:border-box;overflow:auto;box-shadow:0 28px 100px #10251a40}
+#swiftRideMap::backdrop{background:#16291f99;backdrop-filter:blur(7px)}
+#swiftRideMap header{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:16px}
+#swiftRideMap header h2{font-size:28px;letter-spacing:-1px;margin:0}
+#rideMapClose{width:48px;min-height:48px;border:1px solid #e3e7df;border-radius:50%;background:#f5f7f2;font-size:20px;flex-shrink:0}
+#rideMapCanvas{height:340px!important;width:100%;border-radius:20px;overflow:hidden;background:#edf1e9}
+.offer-customer{display:flex;justify-content:space-between;align-items:center;margin:0 0 18px;gap:12px;font-weight:800;font-size:19px}
+.offer-customer small{font:12px 'DM Mono',monospace;color:#849184}
+.offer-route{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:18px;background:#f6f7f3;border-radius:18px}
+.offer-route>div{display:flex;align-items:center;gap:12px;min-width:0}
+.offer-route b{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:#20392d;color:#fff;flex-shrink:0}
+.offer-route p{margin:0;font-size:14px;line-height:1.5;overflow-wrap:anywhere}
+.offer-route small{display:block;color:#738173;font-size:11px}
+#rideOfferDetails .ride-money{margin:16px 0;padding:20px;background:#fff1e4;border-radius:20px}
+#rideOfferDetails .ride-money-lead{display:flex;justify-content:space-between;gap:12px;align-items:center}
+#rideOfferDetails .ride-money-lead span{display:block;font-size:12px;color:#886447}
+#rideOfferDetails .ride-money-lead strong{display:block;font-size:34px;font-weight:800;letter-spacing:-1px}
+#rideOfferDetails .ride-money-breakdown>div{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;gap:12px}
+#rideOfferDetails .ride-money-breakdown dd{margin:0;font-weight:700}
+#rideOfferDetails .ride-money-note,#rideOfferDetails .ride-money-explain{font-size:12px;line-height:1.7;color:#746a5c}
+#rideOfferActions{display:grid;grid-template-columns:1.5fr 1fr;gap:12px;margin-top:16px}
+#rideOfferStatus{font-size:14px;color:#a24330}
+#rideMapNotice,#rideRoadNote{font-size:12px;line-height:1.5;color:#738173}
+@media(max-width:600px){#swiftRideMap{width:calc(100% - 20px)!important;max-height:calc(100dvh - max(20px,env(safe-area-inset-top)) - env(safe-area-inset-bottom))!important;padding:20px!important;border-radius:24px!important}#swiftRideMap header h2{font-size:24px}.offer-route{grid-template-columns:1fr}#rideMapCanvas{height:250px!important}#rideOfferActions{grid-template-columns:1fr;gap:0}#swiftRidePanel .ride-card{padding:18px!important}.driver-slide>span{font-size:13px}}
+@media(prefers-reduced-motion:reduce){#swiftRideMap{scroll-behavior:auto}}
