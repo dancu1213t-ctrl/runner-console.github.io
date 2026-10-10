@@ -176,7 +176,7 @@ function finishDriverSlide(input){if(input.disabled)return;if(Number(input.value
 document.addEventListener('pointerup',e=>{if(e.target.matches('[data-driver-slide]'))finishDriverSlide(e.target);});
 document.addEventListener('keyup',e=>{if(e.target.matches('[data-driver-slide]')&&['ArrowRight','ArrowUp','End'].includes(e.key))finishDriverSlide(e.target);});
 document.addEventListener('pointercancel',e=>{if(e.target.matches('[data-driver-slide]')){e.target.value=0;e.target.parentElement.style.setProperty('--slide','0%');}});
-function syncDriverSlide(){const b=document.getElementById('rideOnline');if(!b)return;let host=document.getElementById('driverPresenceSlider');if(!host){host=document.createElement('div');host.id='driverPresenceSlider';b.after(host);b.classList.add('driver-presence-original');host.addEventListener('swift-slide-confirm',async e=>{const input=e.detail.input;input.disabled=true;host.setAttribute('aria-busy','true');try{await b.onclick();}finally{host.removeAttribute('aria-busy');syncDriverSlide();}});}host.hidden=b.hidden;const active=b.getAttribute('aria-pressed')==='true';host.innerHTML='<div class="driver-presence-caption"><i class="'+(active?'active':'')+'"></i>'+ (active?'Active · Ready for rides':'Offline · Taking a break')+'</div>'+window.swiftDriverSlideMarkup('presence',active?'Slide to go offline':'Slide to go active');}
+function syncDriverSlide(){const b=document.getElementById('rideOnline');if(!b)return;const wanted=b.getAttribute('aria-pressed')==='true';let host=document.getElementById('driverPresenceSlider');if(!host){host=document.createElement('div');host.id='driverPresenceSlider';b.after(host);b.classList.add('driver-presence-original');host.addEventListener('swift-slide-confirm',async e=>{if(host.getAttribute('aria-busy')==='true')return;const input=e.detail.input;input.disabled=true;host.setAttribute('aria-busy','true');try{await b.onclick();}finally{input.disabled=false;host.removeAttribute('aria-busy');syncDriverSlide();}});}host.hidden=b.hidden;if(host.getAttribute('aria-busy')==='true')return;const active=wanted;if(host.dataset.state===String(active)&&host.querySelector('input'))return;host.dataset.state=String(active);host.innerHTML='<div class="driver-presence-caption"><i class="'+(active?'active':'')+'"></i>'+ (active?'Active · Ready for rides':'Offline · Taking a break')+'</div>'+window.swiftDriverSlideMarkup('presence',active?'Slide to go offline':'Slide to go active');}
 window.addEventListener('swift-driver-presence-ui',syncDriverSlide);
 document.addEventListener('DOMContentLoaded',syncDriverSlide);
 </script>
@@ -563,10 +563,13 @@ renderOrders=function(){originalRenderOrders();if(currentProfile?.role!=='admin'
   if(btn.dataset.action==='cancel'&&!confirm('Cancel this ride request?'))return;
   await performRideAction(btn.dataset.id,btn.dataset.action,btn);
  };
+ let rideActionBusy=false;
  async function performRideAction(id,action,btn){
-  if(btn.disabled)return;btn.disabled=true;
+  if(btn.disabled||rideActionBusy)return;rideActionBusy=true;btn.disabled=true;
+  $('rideOfferStatus').textContent=action==='accept'?'Accepting ride…':action==='cancel'?'Cancelling ride…':'Updating ride…';
+  $('rideOfferActions').querySelectorAll('input').forEach(i=>i.disabled=true);
   try{await rpc('swiftride_action_priced',{p_id:id,p_action:action});stopLoudAlarm();if(action==='accept')$('rideFilter').value='mine';if(rideMapDialog.open)rideMapDialog.close();await refresh();}
-  catch(e){notice(e.message);$('rideOfferStatus').textContent='Could not '+action+' ride: '+e.message;}finally{btn.disabled=false;}
+  catch(e){notice(e.message);$('rideOfferStatus').textContent='Could not '+action+' ride: '+e.message;}finally{rideActionBusy=false;btn.disabled=false;$('rideOfferActions').querySelectorAll('input').forEach(i=>i.disabled=false);}
  };
  const rideMapDialog=document.createElement('dialog');rideMapDialog.id='swiftRideMap';
  rideMapDialog.innerHTML='<header><h2 id="rideOfferTitle">Ride map</h2><button type="button" id="rideMapClose" aria-label="Close ride preview">✕</button></header><div id="rideOfferDetails"></div><div id="rideMapCanvas"></div><div id="rideOfferActions"></div><p id="rideOfferStatus" role="status" aria-live="polite"></p><p id="rideMapNotice" role="status"></p><p id="rideRoadNote" role="status">Dotted line connects pickup to destination; road route loads when available.</p>';
