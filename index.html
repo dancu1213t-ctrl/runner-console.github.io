@@ -611,7 +611,7 @@ renderOrders=function(){originalRenderOrders();if(currentProfile?.role!=='admin'
   $('rideOnline').hidden=currentProfile?.role!=='driver';window.dispatchEvent(new Event('swift-driver-presence-ui'));if(id&&currentProfile?.role==='driver'&&autoOnlineFor!==id){autoOnlineFor=id;try{const preference=await rpc('swiftride_driver_online');if(preference.online)await startOnline(false);else notice('Offline for ride alerts. Tap Go online to resume.');}catch(e){autoOnlineFor=null;notice('Online preference could not load: '+e.message);}}loadVehicle();dashboard();
   if(!document.hidden&&currentUser)await refresh();
  }
- window.SwiftDriverRideBridge={action:performRideAction,finish(id){const button=[...$('rideRows').querySelectorAll('button[data-action=completed]')].find(b=>b.dataset.id===id);if(button)button.click();else notice('Open your current ride to complete payment.');}};sync();setInterval(sync,5000);
+ window.SwiftDriverRideBridge={action:performRideAction,finish(id){const ride=rows.find(r=>r.id===id);if(ride?.payment_method==='SwiftPay'&&window.SwiftTeamScanner){window.SwiftTeamScanner.payment();return;}const button=[...$('rideRows').querySelectorAll('button[data-action=completed]')].find(b=>b.dataset.id===id);if(button)button.click();else notice('Open your current ride to complete payment.');}};sync();setInterval(sync,5000);
  document.addEventListener('visibilitychange',()=>{if(!document.hidden){sample();refresh();}});
  // GPS may expire in the background; the saved ride-alert preference does not.
  window.addEventListener('pagehide',()=>{stopLocal();});
