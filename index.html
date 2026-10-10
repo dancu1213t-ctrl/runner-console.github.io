@@ -169,6 +169,17 @@ button:focus-visible,a:focus-visible{outline:3px solid #eab488;outline-offset:3p
 @media(max-width:600px){#workerProfilePanel{padding:20px}#workerProfileForm{grid-template-columns:1fr;gap:18px}#workerVehicle{padding:16px;gap:14px}#workerProfileForm .worker-profile-actions{flex-wrap:wrap}#workerProfileForm .worker-profile-actions button{flex:1}#swiftRidePanel .driver-welcome p{font-size:11px}}
 @media(max-width:380px){#workerVehicle{grid-template-columns:1fr}}
 </style><link rel="stylesheet" href="team-ui.css?v=flow20261008">
+<link rel="stylesheet" href="driver-cards.css?v=20261009cards"><script>
+window.swiftDriverSlideMarkup=(action,label)=>'<label class="driver-slide '+(action==='cancel'?'driver-slide-cancel':'')+'"><span>'+label+'</span><input type="range" min="0" max="100" value="0" data-driver-slide="'+action+'" aria-label="'+label+'"></label>';
+document.addEventListener('input',e=>{if(e.target.matches('[data-driver-slide]'))e.target.parentElement.style.setProperty('--slide',e.target.value+'%');});
+function finishDriverSlide(input){if(input.disabled)return;if(Number(input.value)>=96){input.value=0;input.parentElement.style.setProperty('--slide','0%');input.dispatchEvent(new CustomEvent('swift-slide-confirm',{bubbles:true,detail:{action:input.dataset.driverSlide,input}}));}else{input.value=0;input.parentElement.style.setProperty('--slide','0%');}}
+document.addEventListener('pointerup',e=>{if(e.target.matches('[data-driver-slide]'))finishDriverSlide(e.target);});
+document.addEventListener('keyup',e=>{if(e.target.matches('[data-driver-slide]')&&['ArrowRight','ArrowUp','End'].includes(e.key))finishDriverSlide(e.target);});
+document.addEventListener('pointercancel',e=>{if(e.target.matches('[data-driver-slide]')){e.target.value=0;e.target.parentElement.style.setProperty('--slide','0%');}});
+function syncDriverSlide(){const b=document.getElementById('rideOnline');if(!b)return;let host=document.getElementById('driverPresenceSlider');if(!host){host=document.createElement('div');host.id='driverPresenceSlider';b.after(host);b.classList.add('driver-presence-original');host.addEventListener('swift-slide-confirm',async e=>{const input=e.detail.input;input.disabled=true;host.setAttribute('aria-busy','true');try{await b.onclick();}finally{host.removeAttribute('aria-busy');syncDriverSlide();}});}host.hidden=b.hidden;const active=b.getAttribute('aria-pressed')==='true';host.innerHTML='<div class="driver-presence-caption"><i class="'+(active?'active':'')+'"></i>'+ (active?'Active · Ready for rides':'Offline · Taking a break')+'</div>'+window.swiftDriverSlideMarkup('presence',active?'Slide to go offline':'Slide to go active');}
+window.addEventListener('swift-driver-presence-ui',syncDriverSlide);
+document.addEventListener('DOMContentLoaded',syncDriverSlide);
+</script>
 </head>
 <body class="text-slate-800 min-h-screen selection:bg-emerald-600 selection:text-white">
   <div class="orb w-80 h-80 bg-orange-300 -top-24 -left-24"></div><div class="orb w-96 h-96 bg-amber-200 -bottom-48 -right-20"></div>
@@ -476,7 +487,7 @@ renderOrders=function(){originalRenderOrders();if(currentProfile?.role!=='admin'
  let desiredOnline=false;let autoOnlineFor=null;let sampling=false;let locationTimer=null,requestVersion=0,knownRides=new Set(),firstRideLoad=true;
  const labels={requested:'Waiting for a driver',accepted:'Driver on the way',arrived:'Driver arrived',in_progress:'Ride in progress',completed:'Completed',cancelled:'Cancelled'};
  function notice(text){$('rideNotice').textContent=text;dashboard();} function dashboard(){const fresh=online&&position&&Date.now()-position.at<60000;$('driverGPSState').textContent=!online?'Offline':fresh?'GPS connected':'Connecting GPS';$('driverPrecision').textContent=fresh?'Accuracy ±'+Math.round(position.accuracy)+' m · Synced '+(lastSent?new Date(lastSent).toLocaleTimeString():'soon'):'Keep this page open while online';$('driverOpenCount').textContent=rows.filter(r=>r.status==='requested').length;$('driverActiveCount').textContent=rows.filter(r=>r.driver_id===currentUser?.id&&['accepted','arrived','in_progress'].includes(r.status)).length;}
- function onlineUI(){ $('rideOnline').textContent=online?'● Online · Go offline':'Go online for rides';$('rideOnline').setAttribute('aria-pressed',String(online)); }
+ function onlineUI(){ $('rideOnline').textContent=online?'● Active · Go offline':'Offline · Go active';$('rideOnline').setAttribute('aria-pressed',String(online));window.dispatchEvent(new Event('swift-driver-presence-ui')); }
  async function rpc(name,args){const {data,error}=await supabaseClient.rpc(name,args);if(error)throw error;return data;}
  function stopLocal(){++sequence;if(watch!==null)navigator.geolocation.clearWatch(watch);watch=null;clearInterval(locationTimer);locationTimer=null;online=false;position=null;lastSent=0;onlineUI();dashboard();}
  async function offline(){
@@ -527,7 +538,7 @@ renderOrders=function(){originalRenderOrders();if(currentProfile?.role!=='admin'
   $('rideCount').textContent=list.length+' ride'+(list.length===1?'':'s');
   $('rideRows').innerHTML=list.map(r=>{
    let actions='';const action=(value,label)=>'<button type="button" data-action="'+value+'" data-id="'+safe(r.id)+'">'+label+'</button>';
-   if(!admin&&r.status==='requested')actions=action('accept','Accept this ride');
+   if(!admin&&r.status==='requested')actions=action('accept','Accept ride')+action('cancel','Cancel ride');
    if(!admin&&r.driver_id===currentUser?.id){if(r.status==='accepted')actions=action('arrived','I have arrived');if(r.status==='arrived')actions=action('in_progress','Start ride');if(r.status==='in_progress')actions=action('completed','Complete ride');}
    if(admin&&['requested','accepted','arrived'].includes(r.status))actions=action('cancel','Cancel ride');
    const fresh=r.driver_online&&r.location_updated_at&&Date.now()-new Date(r.location_updated_at).getTime()<90000;
@@ -540,7 +551,7 @@ renderOrders=function(){originalRenderOrders();if(currentProfile?.role!=='admin'
   loading=true;const version=++requestVersion,user=currentUser.id;
   try{const data=await rpc('swiftride_queue_priced');if(version!==requestVersion||currentUser?.id!==user)return;rows=data||[];if(currentProfile?.role==='driver'){try{const daily=await rpc('swiftride_commission_today');if(version===requestVersion&&currentUser?.id===user){commissionSummary=daily;commissionSummaryAt=Date.now();}if(version===requestVersion&&currentUser?.id===user)$('rideCommissionToday').textContent='Today (Belize): '+daily.completedRides+' completed rides · Commission BZD $'+Number(daily.commissionPaid).toFixed(2)+' / $5.00'+(Number(daily.commissionRemaining)===0?' · Further rides today are commission-free.':'');}catch{commissionSummary=null;$('rideCommissionToday').textContent='Daily commission summary unavailable. Final commission is recorded on completion.';}}else $('rideCommissionToday').textContent='';const offered=rows.filter(r=>r.status==='requested');const hasNew=offered.some(r=>!knownRides.has(r.id));offered.forEach(r=>knownRides.add(r.id));
    if(!firstRideLoad&&hasNew&&online&&currentProfile?.role==='driver'){triggerLoudAlarm();toast('New ride request. Open Rides to review it.');}firstRideLoad=false;
-   if(!online||!offered.length)stopLoudAlarm();draw();if(!online)notice(currentProfile.role==='admin'?'Ride requests and driver progress update every 5 seconds.':'Go online when you are ready to take rides.');if(rideMapDialog.open)showMap(mapId,false);}
+   if(!online||!offered.length)stopLoudAlarm();draw();if(!online)notice(currentProfile.role==='admin'?'Ride requests and driver progress update every 5 seconds.':'Go online when you are ready to take rides.');if(rideMapDialog.open)showMap(mapId,false);else if(online&&currentProfile?.role==='driver'&&offered.length&&window.swiftDriverOfferSeen!==offered[0].id){window.swiftDriverOfferSeen=offered[0].id;showMap(offered[0].id,true);}}
   catch(e){notice(/swiftride|schema cache|does not exist/i.test(e.message)?'Rides setup is pending. Run SwiftRide-setup.sql in Supabase, then refresh.':'Could not load rides: '+e.message);}
   finally{loading=false;}
  }
@@ -548,19 +559,27 @@ renderOrders=function(){originalRenderOrders();if(currentProfile?.role!=='admin'
  $('rideRows').onclick=async event=>{
   const btn=event.target.closest('button');if(!btn)return;
   if(btn.dataset.map){showMap(btn.dataset.map,true);return;}
-  if(!btn.dataset.action)return;stopLoudAlarm();
-  if(btn.dataset.action==='cancel'&&!confirm('Cancel this ride request?'))return;
-  btn.disabled=true;
-  try{await rpc('swiftride_action_priced',{p_id:btn.dataset.id,p_action:btn.dataset.action});if(btn.dataset.action==='accept')$('rideFilter').value='mine';await refresh();}
-  catch(e){notice(e.message);}finally{btn.disabled=false;}
+  if(!btn.dataset.action)return;
+  await performRideAction(btn.dataset.id,btn.dataset.action,btn);
+ };
+ async function performRideAction(id,action,btn){
+  if(btn.disabled)return;btn.disabled=true;
+  try{await rpc('swiftride_action_priced',{p_id:id,p_action:action});stopLoudAlarm();if(action==='accept')$('rideFilter').value='mine';if(rideMapDialog.open)rideMapDialog.close();await refresh();}
+  catch(e){notice(e.message);$('rideOfferStatus').textContent='Could not '+action+' ride: '+e.message;}finally{btn.disabled=false;}
  };
  const rideMapDialog=document.createElement('dialog');rideMapDialog.id='swiftRideMap';
- rideMapDialog.innerHTML='<header><h2>Ride map</h2><button type="button" id="rideMapClose">Close</button></header><div id="rideMapCanvas"></div><p id="rideMapNotice" role="status"></p><p id="rideRoadNote" role="status">Dotted line connects pickup to destination; road route loads when available.</p>';
+ rideMapDialog.innerHTML='<header><h2 id="rideOfferTitle">Ride map</h2><button type="button" id="rideMapClose" aria-label="Close ride preview">✕</button></header><div id="rideOfferDetails"></div><div id="rideMapCanvas"></div><div id="rideOfferActions"></div><p id="rideOfferStatus" role="status" aria-live="polite"></p><p id="rideMapNotice" role="status"></p><p id="rideRoadNote" role="status">Dotted line connects pickup to destination; road route loads when available.</p>';
  document.body.append(rideMapDialog);$('rideMapClose').onclick=()=>rideMapDialog.close();
+ rideMapDialog.addEventListener('swift-slide-confirm',e=>{if(!mapId)return;performRideAction(mapId,e.detail.action,e.detail.input);});
  let mapId=null,map=null,markers=[],mapVersion=0,roadLines=[],roadSignature='',roadVersion=0;
  rideMapDialog.addEventListener('close',()=>{++mapVersion;});
  async function showMap(id,open){
-  mapId=id;const r=rows.find(x=>x.id===id);if(!r)return;
+  mapId=id;const r=rows.find(x=>x.id===id);if(!r){if(rideMapDialog.open)rideMapDialog.close();return;}
+  const offered=currentProfile?.role==='driver'&&r.status==='requested';
+  $('rideOfferTitle').textContent=offered?'Your next ride':'Ride details';
+  $('rideOfferDetails').innerHTML='<div class="offer-customer"><span>'+safe(r.customer_name)+'</span><small>#'+safe(r.id.slice(0,8))+'</small></div><div class="offer-route"><div><b>A</b><p><small>Pickup</small>'+safe(r.pickup_label)+'</p></div><div><b>B</b><p><small>Destination</small>'+safe(r.dropoff_label)+'</p></div></div>'+driverFareCard(r);
+  if($('rideOfferActions').dataset.signature!==id+':'+r.status){$('rideOfferActions').dataset.signature=id+':'+r.status;$('rideOfferStatus').textContent='';$('rideOfferActions').innerHTML=offered?window.swiftDriverSlideMarkup('accept','Slide to accept ride')+window.swiftDriverSlideMarkup('cancel','Slide to cancel ride'):'';}
+
   if(open&&!rideMapDialog.open)rideMapDialog.showModal();if(!rideMapDialog.open)return;
   const version=++mapVersion;
   try{
@@ -585,7 +604,7 @@ renderOrders=function(){originalRenderOrders();if(currentProfile?.role!=='admin'
  async function sync(){
   const id=currentUser?.id||null;
   if(identity!==id){stopLocal();desiredOnline=false;commissionSummary=null;commissionSummaryAt=0;autoOnlineFor=null;identity=id;rows=[];knownRides=new Set();firstRideLoad=true;draw();await refresh();}
-  $('rideOnline').hidden=currentProfile?.role!=='driver';if(id&&currentProfile?.role==='driver'&&autoOnlineFor!==id){autoOnlineFor=id;try{const preference=await rpc('swiftride_driver_online');if(preference.online)await startOnline(false);else notice('Offline for ride alerts. Tap Go online to resume.');}catch(e){autoOnlineFor=null;notice('Online preference could not load: '+e.message);}}loadVehicle();dashboard();
+  $('rideOnline').hidden=currentProfile?.role!=='driver';window.dispatchEvent(new Event('swift-driver-presence-ui'));if(id&&currentProfile?.role==='driver'&&autoOnlineFor!==id){autoOnlineFor=id;try{const preference=await rpc('swiftride_driver_online');if(preference.online)await startOnline(false);else notice('Offline for ride alerts. Tap Go online to resume.');}catch(e){autoOnlineFor=null;notice('Online preference could not load: '+e.message);}}loadVehicle();dashboard();
   if(!document.hidden&&currentUser)await refresh();
  }
  sync();setInterval(sync,5000);
