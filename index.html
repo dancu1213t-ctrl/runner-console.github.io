@@ -451,10 +451,10 @@ renderOrders=function(){originalRenderOrders();if(currentProfile?.role!=='admin'
   if(button.dataset.action==='dispatch'){
    const s=r.snapshot;field('runTotal').value=(s.pickup_service||s.needs_invoice)?(r.swiftpay?r.swiftpay.amountCents/100:''):(s.total??'');selectedId=r.id;link.hidden=false;field('trackingSelectedLabel').textContent='Linked customer order #'+r.id.slice(0,8).toUpperCase();
    field('customerName').value=s.customer_name||'';field('customerPhone').value=s.phone||'';field('runItems').value=(s.pickup_service?[{quantity:1,name:s.pickup_description||'Already-paid pickup',category:'Pickup service'}]:s.items||[]).map(i=>i.quantity+' × '+i.name+(i.category?' — '+i.category:'')).join('\n')+(s.taco_note?'\n'+s.taco_note:'');field('routeNotes').value=s.arrival_notes||'';
-   const routes=s.routes||[];field('runLocation').value=routes.length===1?routes[0]:'';
+   const routes=s.routes||[];field('runLocation').value=routes[0]||'';
    if(routes.length>1)field('routeNotes').value+='\nMultiple stores: '+routes.join('\n');
    field('paymentMethod').value=/swift/i.test(s.payment)?'SwiftPay':/online/i.test(s.payment)?'Online':'Cash';field('isPaid').checked=false;
-   field('customerName').scrollIntoView({behavior:'smooth',block:'center'});field('trackingAdminNotice').textContent=routes.length===1?'Review the brief and pay, then broadcast as usual.': 'Review the locations and enter the run’s single A-to-B route before broadcasting.';return;
+   field('customerName').scrollIntoView({behavior:'smooth',block:'center'});field('trackingAdminNotice').textContent=routes.length===1?'Review the brief and pay, then broadcast as usual.': 'The first directions link is selected. Review all pickup stores and broadcast when ready.';return;
   }
   button.disabled=true;try{const {error}=await supabaseClient.rpc('set_customer_preparation',{p_id:r.id,p_phase:button.dataset.action});if(error)throw error;await refresh();}catch(error){field('trackingAdminNotice').textContent=error.message;}finally{button.disabled=false;}
  });field('refreshCustomerRequests').onclick=refresh;window.refreshTeamRequests=refresh;
