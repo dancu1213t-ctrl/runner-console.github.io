@@ -64,3 +64,5 @@
 
 
 #runNavigation .rn-sheet{margin-top:0}#runNavigation .rn-map-modes,#runNavigation .rn-map-controls{bottom:36px}#runNavigation.rn-expanded .rn-map-modes,#runNavigation.rn-expanded .rn-map-controls,#runNavigation.rn-expanded .rn-turn{display:none}
+
+@media(max-height:650px){#runNavigation.rn-following header>div{display:none}#runNavigation.rn-following .rn-turn{top:calc(env(safe-area-inset-top,0px) + 16px);left:70px;right:16px}#runNavigation.rn-following .rn-map-controls{display:flex;gap:6px}}
