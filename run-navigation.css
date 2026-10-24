@@ -62,3 +62,5 @@
 @media(min-width:700px){#runNavigation{border-radius:22px;height:calc(100dvh - 32px);max-height:1000px;max-width:500px}#runNavigation header{padding-top:16px}.rn-turn{top:83px!important}}
 @media(max-height:650px){#runNavigation .rn-map-stage{min-height:150px}#runNavigation .rn-sheet{padding:16px 16px 12px;max-height:58%}#runNavigation .rn-meta{margin-bottom:7px}#runNavigation .rn-pay{font-size:26px}#runNavigation .rn-tools{margin-bottom:5px}#runNavigation .rn-actions button{min-height:44px;padding:11px}#runNavigation.rn-following .rn-turn{top:70px;padding:8px 10px}#runNavigation .rn-turn small{display:none}#runNavigation .rn-map-controls{bottom:12px;right:12px}#runNavigation .rn-map-modes{bottom:12px;left:12px}}
 
+
+#runNavigation .rn-sheet{margin-top:0}#runNavigation .rn-map-modes,#runNavigation .rn-map-controls{bottom:36px}#runNavigation.rn-expanded .rn-map-modes,#runNavigation.rn-expanded .rn-map-controls,#runNavigation.rn-expanded .rn-turn{display:none}
