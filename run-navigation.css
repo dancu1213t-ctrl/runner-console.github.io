@@ -66,3 +66,16 @@
 #runNavigation .rn-sheet{margin-top:0}#runNavigation .rn-map-modes,#runNavigation .rn-map-controls{bottom:36px}#runNavigation.rn-expanded .rn-map-modes,#runNavigation.rn-expanded .rn-map-controls,#runNavigation.rn-expanded .rn-turn{display:none}
 
 @media(max-height:650px){#runNavigation.rn-following header>div{display:none}#runNavigation.rn-following .rn-turn{top:calc(env(safe-area-inset-top,0px) + 16px);left:70px;right:16px}#runNavigation.rn-following .rn-map-controls{display:flex;gap:6px}}
+
+/* Keep the delivery dock touch friendly without changing its actions. */
+#runNavigation{overscroll-behavior:none}
+#runNavigation .rn-sheet{overscroll-behavior:contain;scrollbar-width:thin;padding-bottom:max(18px,env(safe-area-inset-bottom))}
+#runNavigation .rn-tools{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+#runNavigation .rn-tools button,#runNavigation .rn-tools a{box-sizing:border-box;display:flex;align-items:center;justify-content:center;min-height:44px;padding:10px 12px;border:1px solid #e4e7e5;border-radius:12px;background:#f6f7f6;color:#25332b;font-family:inherit;font-weight:600;font-size:13px;line-height:1.2;text-decoration:none;box-shadow:none;touch-action:manipulation}
+#runNavigation .rn-actions{display:flex;gap:10px;padding-top:12px}
+#runNavigation .rn-actions button{min-height:50px;border-radius:14px;font-size:16px;font-weight:700;box-shadow:none;touch-action:manipulation}
+#runNavigation #rnDecline{flex:0 0 30%;background:#fff;color:#465148;border:1px solid #dfe4df}
+#runNavigation #rnAction{flex:1;background:#f56b16;color:#fff;border:1px solid #f56b16}
+#runNavigation .rn-tools :focus-visible,#runNavigation .rn-actions :focus-visible{outline:3px solid #9bc6ff;outline-offset:2px}
+#runNavigation .rn-tools :active,#runNavigation .rn-actions button:active{transform:scale(.98)}
+#runNavigation .rn-actions button:disabled{opacity:.55;transform:none}
