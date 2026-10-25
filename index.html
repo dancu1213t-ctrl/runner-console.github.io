@@ -598,8 +598,8 @@ renderOrders=function(){originalRenderOrders();if(currentProfile?.role!=='admin'
    if(open)map.fitBounds(bounds,55);
    const signature=[r.pickup_lat,r.pickup_lng,r.dropoff_lat,r.dropoff_lng].join(',');
    if(signature!==roadSignature){roadSignature=signature;const roadToken=++roadVersion;roadLines.forEach(l=>l.setMap(null));
-    roadLines=[new google.maps.Polyline({map,path:[{lat:r.pickup_lat,lng:r.pickup_lng},{lat:r.dropoff_lat,lng:r.dropoff_lng}],strokeOpacity:0,icons:[{icon:{path:'M 0,-1 0,1',strokeColor:'#e9782b',strokeOpacity:1,scale:3},repeat:'14px',offset:'0'}]})];
-    google.maps.importLibrary('routes').then(async({Route})=>{const {routes}=await Route.computeRoutes({origin:{lat:r.pickup_lat,lng:r.pickup_lng},destination:{lat:r.dropoff_lat,lng:r.dropoff_lng},travelMode:'DRIVING',fields:['path']});if(roadToken!==roadVersion||!routes?.length)return;roadLines.forEach(l=>l.setMap(null));roadLines=routes[0].createPolylines({strokeColor:'#e9782b',strokeWeight:5});roadLines.forEach(l=>l.setMap(map));document.getElementById('rideRoadNote').textContent='Road route shown.';}).catch(()=>{if(roadToken===roadVersion)document.getElementById('rideRoadNote').textContent='Dotted line is an A-to-B guide, not a road route. Enable Routes API for road routing.';});
+    roadLines=[new google.maps.Polyline({map,path:[{lat:r.pickup_lat,lng:r.pickup_lng},{lat:r.dropoff_lat,lng:r.dropoff_lng}],strokeOpacity:0,icons:[{icon:{path:'M 0,-1 0,1',strokeColor:'#191919',strokeOpacity:1,scale:3},repeat:'14px',offset:'0'}]})];
+    google.maps.importLibrary('routes').then(async({Route})=>{const {routes}=await Route.computeRoutes({origin:{lat:r.pickup_lat,lng:r.pickup_lng},destination:{lat:r.dropoff_lat,lng:r.dropoff_lng},travelMode:'DRIVING',fields:['path']});if(roadToken!==roadVersion||!routes?.length)return;roadLines.forEach(l=>l.setMap(null));roadLines=routes[0].createPolylines({strokeColor:'#191919',strokeWeight:5});roadLines.forEach(l=>l.setMap(map));document.getElementById('rideRoadNote').textContent='Road route shown.';}).catch(()=>{if(roadToken===roadVersion)document.getElementById('rideRoadNote').textContent='Dotted line is an A-to-B guide, not a road route. Enable Routes API for road routing.';});
    }
    $('rideMapNotice').textContent='A: Pickup · B: Destination'+(fresh?' · D: Driver (last update '+new Date(r.location_updated_at).toLocaleTimeString()+')':' · Driver location is unavailable or stale.');
   }catch(e){$('rideMapNotice').textContent='Could not load the map: '+e.message;}
@@ -799,4 +799,6 @@ renderOrders=function(){originalRenderOrders();if(currentProfile?.role!=='admin'
 
 <script src="merchant-order-fees.js?v=orders20261024"></script>
 
-<link rel="stylesheet" href="run-navigation.css?v=pin-dock20261024"><script src="dispatch-editor.js?v=20261024"></script><script src="run-route-progress.js?v=app-ui20261024d"></script><script src="run-navigation.js?v=pin-dock20261024"></script>
+<link rel="stylesheet" href="run-navigation.css?v=pin-dock20261024"><script src="dispatch-editor.js?v=20261024"></script><script src="run-route-progress.js?v=app-ui20261024d"></script><script src="run-navigation.js?v=live-black20261024"></script>
+
+
