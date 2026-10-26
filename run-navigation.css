@@ -111,3 +111,5 @@
 #runNavigation :focus-visible{outline:3px solid #f3b57a;outline-offset:3px}
 @media(max-width:370px){#runNavigation .rn-sheet{padding:18px 16px max(14px,env(safe-area-inset-bottom))}#runNavigation .rn-pay{font-size:26px}#runNavigation .rn-tools{gap:8px}#runNavigation .rn-tools a,#runNavigation .rn-tools button{font-size:11px}#runNavigation #rnTarget{font-size:15px}}
 @media(max-height:650px){#runNavigation .rn-sheet{padding-top:15px;max-height:60%}#runNavigation #rnPinNotice{margin-bottom:10px;font-size:10px}#runNavigation .rn-tools{margin-bottom:10px;gap:8px}#runNavigation .rn-tools a,#runNavigation .rn-tools button{min-height:42px;padding:9px}#runNavigation .rn-actions #rnAction,#runNavigation .rn-actions #rnDecline{min-height:46px}#runNavigation .rn-actions{padding-top:10px}#runNavigation .rn-pay{font-size:25px}}
+
+#runNavigation .rn-tools button,#runNavigation .rn-tools a{width:100%;min-width:0;max-width:none}
