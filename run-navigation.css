@@ -37,7 +37,7 @@
 #runNavigation .rn-tools{display:flex;gap:7px;flex-wrap:nowrap;margin:0 0 10px}
 #runNavigation .rn-tools a,#runNavigation .rn-tools button{display:flex;align-items:center;justify-content:center;gap:5px;font-size:11px;min-height:37px;padding:8px 12px;font-weight:650;background:#f5f7f3;border:1px solid #e9ede5;border-radius:11px;color:#344637;text-decoration:none;flex:1;white-space:nowrap}
 #runNavigation .rn-tools [hidden],#runNavigation [hidden]{display:none!important}
-#runNavigation #rnGPS{max-width:95px}
+#runNavigation #rnGPS{max-width:none;width:100%}
 #runNavigation details{padding:0;border-top:1px solid #ecefe8;border-bottom:1px solid #ecefe8;font-size:12px;flex-shrink:0}
 #runNavigation summary{font-size:12px;min-height:38px;display:flex;align-items:center;justify-content:space-between;font-weight:650;list-style:none;color:#5f6d60;cursor:pointer}
 #runNavigation summary::-webkit-details-marker{display:none}
