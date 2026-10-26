@@ -324,7 +324,8 @@ function locationDetails(o){return '<dl class="location-details">'+[['Arrival in
 const adminGross=document.createElement('div');adminGross.style.padding='24px';adminGross.innerHTML='<h3 style="font-weight:800">Lifetime earnings · all payment methods</h3><p class="earnings-note">Completed runner pay, independent of balances and cashouts.</p><table class="weekly-table"><thead><tr><th>Runner</th><th>Total earned</th></tr></thead><tbody id="adminGrossRows"><tr><td colspan="2">Loading…</td></tr></tbody></table>';document.getElementById('adminPanel').lastElementChild.prepend(adminGross);
 const grossPanel=document.createElement('div');grossPanel.className='earnings-cell';grossPanel.style.gridColumn='1 / -1';grossPanel.innerHTML='<p class="earnings-label">Total earned · all payment methods</p><p class="earnings-value" id="grossTotal">Loading…</p><p class="earnings-note">Completed runner pay, including Cash, Online and SwiftPay. Cashouts never reduce these totals.</p><div id="weeklyEarnings"></div>';document.querySelector('.earnings-strip').append(grossPanel);
 let earningsRequest=0;
-async function refreshGrossEarnings(){if(!currentUser)return;const request=++earningsRequest;const {data,error}=await supabaseClient.rpc('runner_earned_totals');if(request!==earningsRequest)return;if(error){document.getElementById('grossTotal').textContent='Unavailable';document.getElementById('weeklyEarnings').textContent='Could not load earned totals. Please refresh.';grossTotals={};return}grossTotals={};for(const row of data||[])grossTotals[row.runner_id]=Number(row.total||0);if(currentProfile?.role==='admin'){document.getElementById('adminGrossRows').innerHTML=(data||[]).map(r=>`<tr><td>${esc(r.display_name||'Runner')}</td><td>$${Number(r.total||0).toFixed(2)}</td></tr>`).join('')||'<tr><td colspan="2">No runner accounts yet.</td></tr>';return;}const own=(data||[]).find(x=>x.runner_id===currentUser.id)||{total:0,weeks:[],undated:0};document.getElementById('grossTotal').textContent='$'+Number(own.total).toFixed(2);document.getElementById('weeklyEarnings').innerHTML='<p class="earnings-note">Monday–Sunday · Belize time · based on completion date</p><table class="weekly-table"><thead><tr><th>Week starting</th><th>Runs</th><th>Earned</th></tr></thead><tbody>'+own.weeks.map(w=>`<tr><td>${esc(w.week)}</td><td>${Number(w.runs)}</td><td>$${Number(w.total).toFixed(2)}</td></tr>`).join('')+'</tbody></table>'+(!own.weeks.length?'<p class="earnings-note">No dated completed runs yet.</p>':'')+(Number(own.undated)?`<p class="earnings-note">$${Number(own.undated).toFixed(2)} from older completed runs has no recorded completion date. Included in total earned.</p>`:'');}
+async function refreshGrossEarnings(){return window.SwiftRunnerEarnings?.refresh();}
+
 const mapDialog=document.createElement('dialog');
 mapDialog.id='routeMapDialog';
 mapDialog.setAttribute('aria-labelledby','routeMapTitle');
@@ -797,8 +798,10 @@ renderOrders=function(){originalRenderOrders();if(currentProfile?.role!=='admin'
 
 <script src="order-chat.js?v=customer-photo20261020" data-chat-role="runner"></script><script src="runner-transport.js?v=20261020"></script>
 
-<script src="merchant-order-fees.js?v=orders20261024"></script>
+<script src="merchant-order-fees.js?v=launch20261025"></script>
 
 <link rel="stylesheet" href="run-navigation.css?v=precise20261025c"><script src="dispatch-editor.js?v=20261024"></script><script src="run-route-progress.js?v=app-ui20261024d"></script><script src="run-navigation.js?v=precise20261025b"></script>
 
 
+
+<link rel="stylesheet" href="runner-earnings.css?v=launch20261025"><script src="runner-earnings.js?v=launch20261025"></script>
