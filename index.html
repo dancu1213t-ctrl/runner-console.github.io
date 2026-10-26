@@ -287,7 +287,7 @@ async function resolveDirectionsLink(value){
  directionsLinkCache.set(raw,expanded);
  return {...route,url:'https://www.google.com/maps/dir/?'+new URLSearchParams({api:'1',origin:route.origin,destination:route.destination,...(route.waypoints.length?{waypoints:route.waypoints.join('|')}:{})})};
 }
-function routeLocation(value){const match=value.match(/^(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)$/);if(!match)return value;const lat=Number(match[1]),lng=Number(match[2]);if(Math.abs(lat)>90||Math.abs(lng)>180)throw new Error('The route contains invalid coordinates.');return {lat,lng};}
+function routeLocation(value){value=String(value||'').trim();const match=value.match(/^(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)$/);if(!match)return value;const lat=Number(match[1]),lng=Number(match[2]);if(Math.abs(lat)>90||Math.abs(lng)>180)throw new Error('The route contains invalid coordinates.');return {lat,lng};}
 
 function readDispatchDetails(){return {dropoff_location:document.getElementById('runLocation').value.trim(),route_type:'delivery',route_notes:document.getElementById('routeNotes').value.trim(),is_paid:document.getElementById('isPaid').checked};}
 
@@ -799,6 +799,6 @@ renderOrders=function(){originalRenderOrders();if(currentProfile?.role!=='admin'
 
 <script src="merchant-order-fees.js?v=orders20261024"></script>
 
-<link rel="stylesheet" href="run-navigation.css?v=pin-dock20261024"><script src="dispatch-editor.js?v=20261024"></script><script src="run-route-progress.js?v=app-ui20261024d"></script><script src="run-navigation.js?v=live-black20261024"></script>
+<link rel="stylesheet" href="run-navigation.css?v=precise20261025"><script src="dispatch-editor.js?v=20261024"></script><script src="run-route-progress.js?v=app-ui20261024d"></script><script src="run-navigation.js?v=precise20261025"></script>
 
 

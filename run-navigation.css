@@ -79,3 +79,35 @@
 #runNavigation .rn-tools :focus-visible,#runNavigation .rn-actions :focus-visible{outline:3px solid #9bc6ff;outline-offset:2px}
 #runNavigation .rn-tools :active,#runNavigation .rn-actions button:active{transform:scale(.98)}
 #runNavigation .rn-actions button:disabled{opacity:.55;transform:none}
+
+/* Navigation refresh: neutral controls, clear primary action and touch spacing. */
+#runNavigation{color:#1d2922;background:#fff}
+#runNavigation .rn-sheet{padding:22px 22px max(18px,env(safe-area-inset-bottom));border-top:1px solid #edf0eb;box-shadow:0 -5px 18px #17231d08}
+#runNavigation .rn-meta{gap:18px;margin-bottom:12px}
+#runNavigation #rnCustomer{font-size:15px;line-height:1.35;letter-spacing:-.2px;color:#25352b}
+#runNavigation #rnKind{font-size:11px;color:#8a958c;margin:4px 0 7px}
+#runNavigation #rnEta{font-size:12px;font-weight:650;color:#536c5b;line-height:1.4}
+#runNavigation .rn-pay{font-size:30px;font-weight:800;letter-spacing:-1.2px;color:#17271e}
+#runNavigation #rnTip{color:#8a958c;font-size:10px;line-height:1.4;max-width:140px;margin-top:5px}
+#runNavigation #rnTarget{font-size:16px;line-height:1.4;font-weight:700;margin:0 0 5px;letter-spacing:-.3px;color:#27392d}
+#runNavigation #rnStatus{color:#7d8c81;font-size:11px;line-height:1.45;margin:0 0 6px;min-height:16px}
+#runNavigation #rnPinNotice{font-size:11px;line-height:1.5;color:#85745e;margin:0 0 15px;padding:0;overflow-wrap:anywhere}
+#runNavigation .rn-tools{gap:10px;margin:0 0 16px}
+#runNavigation .rn-tools button,#runNavigation .rn-tools a{min-height:46px;padding:12px 10px;background:#f7f9f6;color:#49604f;border:1px solid #e8ede5;border-radius:11px;font-size:12px;font-weight:650;line-height:1.3}
+#runNavigation .rn-tools button:hover,#runNavigation .rn-tools a:hover{background:#eff4ec;border-color:#d6e0d1}
+#runNavigation details{border-top:1px solid #edf1e9;border-bottom:1px solid #edf1e9;padding:0;margin-bottom:4px}
+#runNavigation summary{padding:14px 1px;min-height:46px;font-size:12px;font-weight:650;color:#70816f}
+#runNavigation .rn-actions{gap:12px;padding:14px 0 0;background:#fff}
+#runNavigation .rn-actions #rnAction{min-height:52px;background:#1e3025;color:#fff;border:1px solid #1e3025;border-radius:12px;font-size:15px;font-weight:700;box-shadow:none}
+#runNavigation .rn-actions #rnDecline{min-height:52px;background:#fff;color:#986157;border:1px solid #eaddd7;border-radius:12px;font-size:13px;font-weight:650}
+#runNavigation .rn-actions #rnAction:hover{background:#304b39}
+#runNavigation .rn-map-modes{padding:4px;background:#fff;border:1px solid #edf0e8;border-radius:30px;gap:4px;box-shadow:0 3px 12px #1b2d2014}
+#runNavigation .rn-map-modes button{padding:10px 14px;min-height:40px;color:#7a8b7d;font-size:11px;border-radius:24px}
+#runNavigation .rn-map-modes button[aria-pressed=true]{background:#fff0e3;color:#a65c23}
+#runNavigation .rn-map-controls button{background:#fff;color:#2b4232;border:1px solid #e7ede3;border-radius:12px;box-shadow:0 2px 10px #1b2d2010;width:44px;height:44px}
+#runNavigation .rn-turn{background:#1e3025;border-radius:16px;padding:13px 15px}
+#runNavigation #rnVoice{background:#ffffff12;border:1px solid #ffffff24;border-radius:9px;min-height:40px;color:#fff}
+#runNavigation li.current:before{background:#1e3025;color:#fff}
+#runNavigation :focus-visible{outline:3px solid #f3b57a;outline-offset:3px}
+@media(max-width:370px){#runNavigation .rn-sheet{padding:18px 16px max(14px,env(safe-area-inset-bottom))}#runNavigation .rn-pay{font-size:26px}#runNavigation .rn-tools{gap:8px}#runNavigation .rn-tools a,#runNavigation .rn-tools button{font-size:11px}#runNavigation #rnTarget{font-size:15px}}
+@media(max-height:650px){#runNavigation .rn-sheet{padding-top:15px;max-height:60%}#runNavigation #rnPinNotice{margin-bottom:10px;font-size:10px}#runNavigation .rn-tools{margin-bottom:10px;gap:8px}#runNavigation .rn-tools a,#runNavigation .rn-tools button{min-height:42px;padding:9px}#runNavigation .rn-actions #rnAction,#runNavigation .rn-actions #rnDecline{min-height:46px}#runNavigation .rn-actions{padding-top:10px}#runNavigation .rn-pay{font-size:25px}}
