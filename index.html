@@ -300,21 +300,23 @@ window.resolveDirectionsLink=resolveDirectionsLink;
   let dispatchSending=false;
   async function dispatchRun(){
     if(dispatchSending)return;
+    if(window.SwiftWorkerRegions?.isAdmin()&&!window.SwiftWorkerRegions.dispatchLive)return toast('Choose a live service area before dispatching.');
+    const dispatchZone=document.getElementById('dispatchServiceZone')?.value||'orange-walk',viewPicker=document.getElementById('adminViewDistrict');
     const field=id=>document.getElementById(id);
     const name=field('customerName').value.trim(),phone=field('customerPhone').value.trim(),items=field('runItems').value.trim(),location=field('runLocation').value.trim(),pay=Number(field('runPay').value||0),priority=field('runPriority').value,paymentMethod=field('paymentMethod').value;
     if(!name||!items)return toast('Add at least the customer name and run brief.');
     const details=readDispatchDetails(),button=document.querySelector('button[onclick="dispatchRun()"]'),desk=field('dispatchEditor'),previousInert=desk?.inert;
-    const label=button?.textContent;dispatchSending=true;if(button){button.disabled=true;button.textContent='Sending to runners…';}if(desk)desk.inert=true;
+    const label=button?.textContent;dispatchSending=true;if(button){button.disabled=true;button.textContent='Sending to runners…';}if(desk)desk.inert=true;if(viewPicker)viewPicker.disabled=true;
     try{
       const resolvedRoute=await resolveDirectionsLink(location);
-      const config=window.SwiftDispatchEditor.read(resolvedRoute);const {data,error}=await supabaseClient.rpc('swift_dispatch_run',{p_request_id:window.SwiftDispatchEditor.requestId(),p_customer_name:name,p_phone:phone,p_brief:items+(field('runTotal').value!==''?'\nOrder total: BZ$'+Number(field('runTotal').value).toFixed(2):''),p_location:config.url,p_kind:config.kind,p_tip:config.tip,p_stops:config.stops,p_payment_method:paymentMethod,p_details:{...details,service_zone:document.getElementById('dispatchServiceZone')?.value||'orange-walk',dropoff_location:config.url}}).abortSignal(AbortSignal.timeout(12000));
+      const config=window.SwiftDispatchEditor.read(resolvedRoute);const {data,error}=await supabaseClient.rpc('swift_dispatch_run',{p_request_id:window.SwiftDispatchEditor.requestId(),p_customer_name:name,p_phone:phone,p_brief:items+(field('runTotal').value!==''?'\nOrder total: BZ$'+Number(field('runTotal').value).toFixed(2):''),p_location:config.url,p_kind:config.kind,p_tip:config.tip,p_stops:config.stops,p_payment_method:paymentMethod,p_details:{...details,service_zone:dispatchZone,dropoff_location:config.url}}).abortSignal(AbortSignal.timeout(12000));
       if(error)throw error;
       if(!data?.order_id)throw Error('Dispatch receipt was not confirmed. Refresh the order desk before retrying.');
       ['customerName','customerPhone','runItems','runLocation','routeNotes','runTotal'].forEach(id=>field(id).value='');field('isPaid').checked=false;
       window.dispatchEvent(new CustomEvent('swift-run-dispatched',{detail:{orderId:data.order_id,trackingId:details.customer_tracking_id||null}}));
       window.SwiftDispatchEditor.reset();toast('Run broadcast to available runners.');fetchOrders();
     }catch(error){toast('Could not confirm dispatch: '+(error.message||'Please check your connection.')+' Refresh the order desk before retrying.');}
-    finally{dispatchSending=false;if(button){button.disabled=false;button.textContent=label;}if(desk)desk.inert=previousInert;}
+    finally{dispatchSending=false;if(button){button.disabled=false;button.textContent=label;}if(desk)desk.inert=previousInert;if(viewPicker)viewPicker.disabled=false;}
   }
   window.addEventListener('click',initAudioContext,{once:true});window.addEventListener('DOMContentLoaded',async()=>{const {data:{session}}=await supabaseClient.auth.getSession();if(session)await loadSignedInUser(session.user);});
 </script>
@@ -551,10 +553,11 @@ renderOrders=function(){originalRenderOrders();if(currentProfile?.role!=='admin'
    return '<article class="ride-card"><div class="ride-card-top"><h3>'+safe(r.customer_name)+'</h3><span>'+safe(labels[r.status])+'</span></div><small>#'+safe(r.id.slice(0,8))+' · '+safe(new Date(r.created_at).toLocaleString())+'</small><dl><dt>Pickup</dt><dd>'+safe(r.pickup_label)+'</dd><dt>Destination</dt><dd>'+safe(r.dropoff_label)+'</dd></dl><p>'+safe(r.driver_name?'Driver: '+r.driver_name:currentProfile?.role==='driver'?'This request is ready for you.':'Waiting for the quoted driver to accept.')+'</p>'+driverFareCard(r)+(r.driver_id&&!['completed','cancelled'].includes(r.status)?'<p class="ride-location-note">'+(fresh?'GPS connected':'Waiting for a fresh location')+'</p>':'')+'<div class="ride-actions">'+(!admin&&r.driver_id===currentUser?.id&&['accepted','arrived','in_progress'].includes(r.status)?'<button type="button" data-navigate="'+safe(r.id)+'">Navigate</button>':'')+(phone?'<a href="tel:'+safe(phone)+'">Call customer</a>':'')+'<a target="_blank" rel="noopener noreferrer" href="'+routeLink(r)+'">Directions</a><button type="button" data-map="'+safe(r.id)+'">View map</button>'+actions+'</div></article>';
   }).join('')||'<div class="ride-empty">'+(!admin&&!online&&filter==='open'?'Go online to receive ride requests.':(filter==='mine'?'No rides here. Try Open rides.':'You’re all caught up. New requests appear here automatically.'))+'</div>';
  }
+ window.addEventListener('swift-admin-district-change',()=>{if(currentProfile?.role==='admin'){rows=[];draw();refresh();}});
  async function refresh(){
   if(!currentUser||!['admin','driver'].includes(currentProfile?.role)||loading)return;
   loading=true;const version=++requestVersion,user=currentUser.id;
-  try{const data=await rpc('swiftride_queue_priced');if(version!==requestVersion||currentUser?.id!==user)return;rows=data||[];if(currentProfile?.role==='driver'){try{const daily=await rpc('swiftride_commission_today');if(version===requestVersion&&currentUser?.id===user){commissionSummary=daily;commissionSummaryAt=Date.now();}if(version===requestVersion&&currentUser?.id===user)$('rideCommissionToday').textContent='Today (Belize): '+daily.completedRides+' completed rides · Commission BZD $'+Number(daily.commissionPaid).toFixed(2)+' / $5.00'+(Number(daily.commissionRemaining)===0?' · Further rides today are commission-free.':'');}catch{commissionSummary=null;$('rideCommissionToday').textContent='Daily commission summary unavailable. Final commission is recorded on completion.';}}else $('rideCommissionToday').textContent='';const offered=rows.filter(r=>r.status==='requested');const hasNew=offered.some(r=>!knownRides.has(r.id));offered.forEach(r=>knownRides.add(r.id));
+  try{const data=await rpc('swiftride_queue_priced');if(version!==requestVersion||currentUser?.id!==user)return;rows=window.SwiftWorkerRegions?.filterOrders(data||[])||data||[];if(currentProfile?.role==='driver'){try{const daily=await rpc('swiftride_commission_today');if(version===requestVersion&&currentUser?.id===user){commissionSummary=daily;commissionSummaryAt=Date.now();}if(version===requestVersion&&currentUser?.id===user)$('rideCommissionToday').textContent='Today (Belize): '+daily.completedRides+' completed rides · Commission BZD $'+Number(daily.commissionPaid).toFixed(2)+' / $5.00'+(Number(daily.commissionRemaining)===0?' · Further rides today are commission-free.':'');}catch{commissionSummary=null;$('rideCommissionToday').textContent='Daily commission summary unavailable. Final commission is recorded on completion.';}}else $('rideCommissionToday').textContent='';const offered=rows.filter(r=>r.status==='requested');const hasNew=offered.some(r=>!knownRides.has(r.id));offered.forEach(r=>knownRides.add(r.id));
    if(!firstRideLoad&&hasNew&&online&&currentProfile?.role==='driver'){triggerLoudAlarm();toast('New ride request. Open Rides to review it.');}firstRideLoad=false;
    if(!online||!offered.length)stopLoudAlarm();draw();if(!online)notice(currentProfile.role==='admin'?'Ride requests and driver progress update every 5 seconds.':'Go online when you are ready to take rides.');window.SwiftDriverNavigation?.sync(rows,currentUser?.id,currentProfile?.role);if(rideMapDialog.open)showMap(mapId,false);else if(!document.getElementById('driverNavigation')?.open&&online&&currentProfile?.role==='driver'&&offered.length&&window.swiftDriverOfferSeen!==offered[0].id){window.swiftDriverOfferSeen=offered[0].id;showMap(offered[0].id,true);}}
   catch(e){notice(/swiftride|schema cache|does not exist/i.test(e.message)?'Rides setup is pending. Run SwiftRide-setup.sql in Supabase, then refresh.':'Could not load rides: '+e.message);}
@@ -811,6 +814,6 @@ renderOrders=function(){originalRenderOrders();if(currentProfile?.role!=='admin'
 
 
 
-<link rel="stylesheet" href="runner-earnings.css?v=launch20261025"><script src="runner-earnings.js?v=launch20261025"></script>
+<link rel="stylesheet" href="runner-earnings.css?v=launch20261025"><script src="runner-earnings.js?v=portal-ui20261031"></script>
 
-<script src="worker-regions.js?v=portal-ui20261031c"></script>
+<script src="worker-regions.js?v=portal-ui20261031d"></script>
