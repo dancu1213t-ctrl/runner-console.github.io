@@ -1,0 +1,25 @@
+/* Workforce signup spacing only; existing form handlers and fields are unchanged. */
+#loginScreen .signin-shell{box-sizing:border-box}
+#loginScreen #workerApplyForm{margin-top:24px;min-width:0}
+#loginScreen #workerApplyForm>h2{margin:0 0 10px;font-size:24px;line-height:1.25;letter-spacing:-.6px}
+#loginScreen #workerApplyForm>p{font-size:13px;line-height:1.65;margin:0 0 22px}
+#loginScreen #workerApplyForm>label{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:8px!important;margin:18px 0 0!important;padding:0!important;font-size:13px!important;line-height:1.5!important;font-weight:600!important;min-width:0}
+#loginScreen #workerApplyForm>label>input,
+#loginScreen #workerApplyForm>label>select{display:block!important;box-sizing:border-box!important;width:100%!important;max-width:100%!important;min-width:0!important;min-height:48px!important;height:48px!important;margin:0!important;padding:11px 14px!important;border:1px solid #dfe5d9!important;border-radius:12px!important;background:#fafbf8!important;color:#263326!important;font:400 16px/1.4 Manrope,system-ui,sans-serif!important;box-shadow:none!important}
+#loginScreen #workerApplyForm>label>select{padding-right:36px!important;white-space:nowrap;text-overflow:ellipsis}
+#loginScreen #workerApplyForm>button[type=submit]{box-sizing:border-box;width:100%;min-height:50px;padding:14px 18px;margin-top:24px;border-radius:12px;font-size:15px;line-height:1.4}
+#loginScreen #workerApplyNotice{margin:12px 0 0;font-size:13px;line-height:1.6}
+#loginScreen #workerApplyNotice:empty{display:none}
+#loginScreen .worker-kind-cards{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important;margin:22px 0!important}
+#loginScreen .worker-kind-cards>label{display:grid!important;grid-template-columns:20px minmax(0,1fr);column-gap:8px;row-gap:8px;align-items:center;margin:0!important;padding:16px!important;min-width:0;box-sizing:border-box}
+#loginScreen .worker-kind-cards input{width:18px!important;height:18px!important;margin:0!important;min-height:0!important;accent-color:#ed7a2b}
+#loginScreen .worker-kind-cards strong{font-size:15px;line-height:1.4}
+#loginScreen .worker-kind-cards span{grid-column:1/-1;font-size:12px!important;line-height:1.55!important;margin:0!important}
+#loginScreen .worker-auth-tabs{margin-top:24px}
+#loginScreen .worker-auth-tabs button{min-height:44px;font-size:13px}
+@media(max-width:600px){
+ #loginScreen{padding-top:max(24px,calc(env(safe-area-inset-top,0px) + 20px))!important;padding-bottom:calc(24px + env(safe-area-inset-bottom,0px))!important}
+ #loginScreen .signin-shell{width:100%!important;max-width:480px!important;padding:24px 20px!important;margin-inline:auto!important}
+ #loginScreen .worker-kind-cards>label{padding:14px!important}
+ #loginScreen #workerApplyForm>h2{font-size:23px}
+}
