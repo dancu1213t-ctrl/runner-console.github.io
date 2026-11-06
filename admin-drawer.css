@@ -1,5 +1,5 @@
 /* Compact admin menu. Runner/driver navigation stays unchanged. */
-html[data-workspace-role=admin] #dashboardScreen{grid-template-columns:minmax(0,1fr);gap:24px}
+html[data-workspace-role=admin] #dashboardScreen{grid-template-columns:minmax(0,1fr)!important;gap:24px!important}
 .aw-menu-toggle{display:none}
 html[data-workspace-role=admin] .aw-menu-toggle:not([hidden]){display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:44px;padding:10px 14px;border:1px solid #dfe3df;border-radius:12px;background:white;color:#19201b;font-size:13px;font-weight:650;flex-shrink:0}
 html[data-workspace-role=admin] #dashboardScreen>header{flex-wrap:wrap;gap:16px}
@@ -21,4 +21,4 @@ html[data-workspace-role=admin] #awNavigationDrawer .dispatch-navigation button 
 @media(max-width:700px){html[data-workspace-role=admin] #dashboardScreen>header{display:flex;gap:12px}html[data-workspace-role=admin] #dashboardScreen>header>div:first-of-type{flex:1;min-width:0}html[data-workspace-role=admin] #dashboardScreen>header>div:last-child{width:auto;justify-content:flex-end;flex-wrap:wrap}html[data-workspace-role=admin] .aw-menu-toggle span{display:none}html[data-workspace-role=admin] .aw-menu-toggle{width:44px;padding:10px}}
 @media(prefers-reduced-motion:reduce){#awNavigationDrawer[open]{animation:none}}
 
-@media(max-width:700px){html[data-workspace-role=admin] #dashboardScreen>header>div:last-child{flex-basis:100%;width:100%;margin-left:0}html[data-workspace-role=admin] #dashboardScreen>header .brand-mark{flex-shrink:0}html[data-workspace-role=admin] #dashboardScreen header h1{overflow-wrap:anywhere}}
+@media(max-width:700px){html[data-workspace-role=admin] #dashboardScreen>header>div:last-child{flex-basis:100%;width:100%!important;margin-left:0}html[data-workspace-role=admin] #dashboardScreen>header .brand-mark{flex-shrink:0}html[data-workspace-role=admin] #dashboardScreen header h1{overflow-wrap:anywhere}}
