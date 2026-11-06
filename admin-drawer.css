@@ -1,0 +1,22 @@
+/* Compact admin menu. Runner/driver navigation stays unchanged. */
+html[data-workspace-role=admin] #dashboardScreen{grid-template-columns:minmax(0,1fr);gap:24px}
+.aw-menu-toggle{display:none}
+html[data-workspace-role=admin] .aw-menu-toggle:not([hidden]){display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:44px;padding:10px 14px;border:1px solid #dfe3df;border-radius:12px;background:white;color:#19201b;font-size:13px;font-weight:650;flex-shrink:0}
+html[data-workspace-role=admin] #dashboardScreen>header{flex-wrap:wrap;gap:16px}
+html[data-workspace-role=admin] #dashboardScreen>header>div:last-child{margin-left:auto}
+#awNavigationDrawer{position:fixed;inset:0 auto 0 0;margin:0;width:min(320px,86vw);max-width:86vw;height:100%;height:100dvh;max-height:100dvh;border:0;border-right:1px solid #e3e7e3;border-radius:0 22px 22px 0;padding:max(22px,env(safe-area-inset-top)) 18px max(22px,env(safe-area-inset-bottom));background:#fff;color:#1b211d;box-shadow:12px 0 50px #10181220;overflow-y:auto;overscroll-behavior:contain}
+#awNavigationDrawer::backdrop{background:#10181260}
+#awNavigationDrawer[open]{animation:aw-drawer-in .18s ease-out}
+.aw-drawer-top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:6px 4px 22px;margin-bottom:12px;border-bottom:1px solid #e8ebe7}
+.aw-drawer-top small{font-size:10px;letter-spacing:1.8px;color:#7b837c;font-weight:700}
+.aw-drawer-top h2{font-size:23px;font-weight:750;letter-spacing:-.6px;margin:6px 0 0}
+.aw-drawer-close{width:44px;height:44px;min-width:44px;border:1px solid #e5e8e3;border-radius:50%;background:#f5f6f3;color:#202720;font-size:28px;line-height:1}
+html[data-workspace-role=admin] #awNavigationDrawer .dispatch-navigation{display:flex!important;position:static!important;inset:auto!important;flex-direction:column!important;gap:6px!important;width:100%;padding:0!important;margin:0;border:0;border-radius:0;background:transparent;backdrop-filter:none}
+html[data-workspace-role=admin] #awNavigationDrawer .dispatch-navigation button{display:flex!important;flex-direction:row!important;align-items:center;justify-content:flex-start;gap:13px;flex:none;min-height:48px;width:100%;padding:13px 14px!important;font-size:13px!important;text-align:left;white-space:normal;border-radius:11px;background:transparent;color:#626d64}
+html[data-workspace-role=admin] #awNavigationDrawer .dispatch-navigation button[aria-current=page]{background:#1b221d;color:#fff}
+html[data-workspace-role=admin] #awNavigationDrawer .dispatch-navigation button svg{width:20px;height:20px;flex-shrink:0}
+.aw-menu-open,.aw-menu-open body{overflow:hidden!important}
+.aw-menu-toggle:focus-visible,.aw-drawer-close:focus-visible,#awNavigationDrawer button:focus-visible{outline:2px solid #ff7b20;outline-offset:3px}
+@keyframes aw-drawer-in{from{transform:translateX(-24px);opacity:0}to{transform:translateX(0);opacity:1}}
+@media(max-width:700px){html[data-workspace-role=admin] #dashboardScreen>header{display:flex;gap:12px}html[data-workspace-role=admin] #dashboardScreen>header>div:first-of-type{flex:1;min-width:0}html[data-workspace-role=admin] #dashboardScreen>header>div:last-child{width:auto;justify-content:flex-end;flex-wrap:wrap}html[data-workspace-role=admin] .aw-menu-toggle span{display:none}html[data-workspace-role=admin] .aw-menu-toggle{width:44px;padding:10px}}
+@media(prefers-reduced-motion:reduce){#awNavigationDrawer[open]{animation:none}}
